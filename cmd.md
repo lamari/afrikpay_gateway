@@ -20,13 +20,6 @@ Tu es maintenant l'architecte principal du projet Afrikpay Gateway. Ta mission e
 8. Passe automatiquement à la tâche suivante
 9. Répète jusqu'à completion du projet
 
-⚡ ACTION IMMÉDIATE :
-Commence par la Phase 0.1 : "Créer la structure de projet"
-- Crée l'arborescence complète selon .windsurfrules
-- Initialise tous les go.mod
-- Configure go.work
-- Valide que tout fonctionne
-- Marque terminé dans taches.md
 
 🎯 RÈGLE FONDAMENTALE : 
 À CHAQUE tâche terminée, tu DOIS mettre à jour taches.md en cochant [x] et notant la date/heure.

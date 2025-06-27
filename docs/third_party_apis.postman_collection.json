@@ -1,0 +1,814 @@
+{
+	"info": {
+		"name": "Afrikpay Third Party APIs Validation",
+		"description": "Collection to test direct API calls to Binance, Bitget, MTN, and Orange APIs to validate our client implementations",
+		"version": "1.0.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "noauth"
+	},
+	"variable": [
+		{
+			"key": "binance_base_url",
+			"value": "https://api.binance.com",
+			"type": "string"
+		},
+		{
+			"key": "binance_testnet_url",
+			"value": "https://testnet.binance.vision",
+			"type": "string"
+		},
+		{
+			"key": "bitget_base_url",
+			"value": "https://api.bitget.com",
+			"type": "string"
+		},
+		{
+			"key": "mtn_sandbox_url",
+			"value": "https://sandbox.momodeveloper.mtn.com",
+			"type": "string"
+		},
+		{
+			"key": "orange_sandbox_url",
+			"value": "https://api.orange.com",
+			"type": "string"
+		},
+		{
+			"key": "binance_api_key",
+			"value": "YOUR_BINANCE_API_KEY",
+			"type": "string"
+		},
+		{
+			"key": "bitget_api_key",
+			"value": "YOUR_BITGET_API_KEY",
+			"type": "string"
+		},
+		{
+			"key": "bitget_secret_key",
+			"value": "YOUR_BITGET_SECRET_KEY",
+			"type": "string"
+		},
+		{
+			"key": "bitget_passphrase",
+			"value": "YOUR_BITGET_PASSPHRASE",
+			"type": "string"
+		},
+		{
+			"key": "mtn_api_key",
+			"value": "YOUR_MTN_API_KEY",
+			"type": "string"
+		},
+		{
+			"key": "mtn_subscription_key",
+			"value": "YOUR_MTN_SUBSCRIPTION_KEY",
+			"type": "string"
+		},
+		{
+			"key": "orange_api_key",
+			"value": "YOUR_ORANGE_API_KEY",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Binance API Tests",
+			"item": [
+				{
+					"name": "Get Price - BTCUSDT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has symbol and price', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('symbol');",
+									"    pm.expect(jsonData).to.have.property('price');",
+									"    pm.expect(jsonData.symbol).to.eql('BTCUSDT');",
+									"    pm.expect(parseFloat(jsonData.price)).to.be.a('number');",
+									"});",
+									"",
+									"pm.test('Price format matches our client expectation', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client expects price as string that can be parsed to float",
+									"    pm.expect(jsonData.price).to.be.a('string');",
+									"    pm.expect(parseFloat(jsonData.price)).to.be.above(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-MBX-APIKEY",
+								"value": "{{binance_api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{binance_base_url}}/api/v3/ticker/price?symbol=BTCUSDT",
+							"host": [
+								"{{binance_base_url}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"ticker",
+								"price"
+							],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "BTCUSDT"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Price - ETHUSDT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has symbol and price', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('symbol');",
+									"    pm.expect(jsonData).to.have.property('price');",
+									"    pm.expect(jsonData.symbol).to.eql('ETHUSDT');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-MBX-APIKEY",
+								"value": "{{binance_api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{binance_base_url}}/api/v3/ticker/price?symbol=ETHUSDT",
+							"host": [
+								"{{binance_base_url}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"ticker",
+								"price"
+							],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "ETHUSDT"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Prices (24hr Ticker)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is array of tickers', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    pm.expect(jsonData.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Each ticker has required fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    const firstTicker = jsonData[0];",
+									"    pm.expect(firstTicker).to.have.property('symbol');",
+									"    pm.expect(firstTicker).to.have.property('lastPrice');",
+									"    pm.expect(firstTicker).to.have.property('volume');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-MBX-APIKEY",
+								"value": "{{binance_api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{binance_base_url}}/api/v3/ticker/24hr",
+							"host": [
+								"{{binance_base_url}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"ticker",
+								"24hr"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bitget API Tests",
+			"item": [
+				{
+					"name": "Get Ticker - BTCUSDT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('code');",
+									"    pm.expect(jsonData).to.have.property('msg');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Data has required fields for our client', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.code === '00000' && jsonData.data) {",
+									"        pm.expect(jsonData.data).to.have.property('symbol');",
+									"        pm.expect(jsonData.data).to.have.property('lastPr');",
+									"        pm.expect(jsonData.data).to.have.property('baseVolume');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "ACCESS-KEY",
+								"value": "{{bitget_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "ACCESS-TIMESTAMP",
+								"value": "{{$timestamp}}",
+								"type": "text"
+							},
+							{
+								"key": "ACCESS-SIGN",
+								"value": "SIGNATURE_PLACEHOLDER",
+								"type": "text",
+								"description": "This needs to be calculated based on Bitget's signature algorithm"
+							},
+							{
+								"key": "ACCESS-PASSPHRASE",
+								"value": "{{bitget_passphrase}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{bitget_base_url}}/api/spot/v1/market/ticker?symbol=BTCUSDT",
+							"host": [
+								"{{bitget_base_url}}"
+							],
+							"path": [
+								"api",
+								"spot",
+								"v1",
+								"market",
+								"ticker"
+							],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "BTCUSDT"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Tickers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has correct structure', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('code');",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Data is array of tickers', function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.code === '00000') {",
+									"        pm.expect(jsonData.data).to.be.an('array');",
+									"        if (jsonData.data.length > 0) {",
+									"            const firstTicker = jsonData.data[0];",
+									"            pm.expect(firstTicker).to.have.property('symbol');",
+									"            pm.expect(firstTicker).to.have.property('lastPr');",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "ACCESS-KEY",
+								"value": "{{bitget_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "ACCESS-TIMESTAMP",
+								"value": "{{$timestamp}}",
+								"type": "text"
+							},
+							{
+								"key": "ACCESS-SIGN",
+								"value": "SIGNATURE_PLACEHOLDER",
+								"type": "text"
+							},
+							{
+								"key": "ACCESS-PASSPHRASE",
+								"value": "{{bitget_passphrase}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{bitget_base_url}}/api/spot/v1/market/tickers",
+							"host": [
+								"{{bitget_base_url}}"
+							],
+							"path": [
+								"api",
+								"spot",
+								"v1",
+								"market",
+								"tickers"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "MTN Mobile Money API Tests",
+			"item": [
+				{
+					"name": "Get Account Balance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has balance information', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('availableBalance');",
+									"    pm.expect(jsonData).to.have.property('currency');",
+									"});",
+									"",
+									"pm.test('Balance format matches our client expectation', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client expects availableBalance as string",
+									"    pm.expect(jsonData.availableBalance).to.be.a('string');",
+									"    pm.expect(parseFloat(jsonData.availableBalance)).to.be.a('number');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mtn_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Target-Environment",
+								"value": "sandbox",
+								"type": "text"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{mtn_subscription_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{mtn_sandbox_url}}/collection/v1_0/accountbalance",
+							"host": [
+								"{{mtn_sandbox_url}}"
+							],
+							"path": [
+								"collection",
+								"v1_0",
+								"accountbalance"
+							]
+						}
+					}
+				},
+				{
+					"name": "Request to Pay",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 202 (Accepted)', function () {",
+									"    pm.response.to.have.status(202);",
+									"});",
+									"",
+									"pm.test('Response has X-Reference-Id header', function () {",
+									"    pm.expect(pm.response.headers.get('X-Reference-Id')).to.not.be.null;",
+									"    // Store reference ID for status check",
+									"    pm.globals.set('mtn_reference_id', pm.response.headers.get('X-Reference-Id'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mtn_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Reference-Id",
+								"value": "{{$guid}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Target-Environment",
+								"value": "sandbox",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{mtn_subscription_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": \"100.00\",\n    \"currency\": \"EUR\",\n    \"externalId\": \"test-{{$timestamp}}\",\n    \"payer\": {\n        \"partyIdType\": \"MSISDN\",\n        \"partyId\": \"256774290781\"\n    },\n    \"payerMessage\": \"Test payment from Afrikpay\",\n    \"payeeNote\": \"Payment for crypto purchase\"\n}"
+						},
+						"url": {
+							"raw": "{{mtn_sandbox_url}}/collection/v1_0/requesttopay",
+							"host": [
+								"{{mtn_sandbox_url}}"
+							],
+							"path": [
+								"collection",
+								"v1_0",
+								"requesttopay"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has payment status fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('amount');",
+									"    pm.expect(jsonData).to.have.property('currency');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});",
+									"",
+									"pm.test('Status field matches our client expectations', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client maps MTN statuses to our internal statuses",
+									"    const validStatuses = ['PENDING', 'SUCCESSFUL', 'FAILED'];",
+									"    pm.expect(validStatuses).to.include(jsonData.status);",
+									"});",
+									"",
+									"pm.test('Amount format matches our client expectation', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client expects amount as string",
+									"    pm.expect(jsonData.amount).to.be.a('string');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mtn_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Target-Environment",
+								"value": "sandbox",
+								"type": "text"
+							},
+							{
+								"key": "Ocp-Apim-Subscription-Key",
+								"value": "{{mtn_subscription_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{mtn_sandbox_url}}/collection/v1_0/requesttopay/{{mtn_reference_id}}",
+							"host": [
+								"{{mtn_sandbox_url}}"
+							],
+							"path": [
+								"collection",
+								"v1_0",
+								"requesttopay",
+								"{{mtn_reference_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Orange Money API Tests",
+			"item": [
+				{
+					"name": "Get Account Balance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has balance information', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('balance');",
+									"    pm.expect(jsonData).to.have.property('currency');",
+									"});",
+									"",
+									"pm.test('Balance format matches our client expectation', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client expects balance as number (float64)",
+									"    pm.expect(jsonData.balance).to.be.a('number');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{orange_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{orange_sandbox_url}}/omcoreapis/1.0.2/mp/balance",
+							"host": [
+								"{{orange_sandbox_url}}"
+							],
+							"path": [
+								"omcoreapis",
+								"1.0.2",
+								"mp",
+								"balance"
+							]
+						}
+					}
+				},
+				{
+					"name": "Initiate Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201 (Created)', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response has transaction information', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('transactionId');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    // Store transaction ID for status check",
+									"    pm.globals.set('orange_transaction_id', jsonData.transactionId);",
+									"});",
+									"",
+									"pm.test('Transaction ID format matches our client expectation', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client expects transactionId as string",
+									"    pm.expect(jsonData.transactionId).to.be.a('string');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{orange_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 100.00,\n    \"currency\": \"XOF\",\n    \"phoneNumber\": \"+22507000000\",\n    \"description\": \"Test payment from Afrikpay\",\n    \"externalId\": \"test-{{$timestamp}}\"\n}"
+						},
+						"url": {
+							"raw": "{{orange_sandbox_url}}/omcoreapis/1.0.2/mp/pay",
+							"host": [
+								"{{orange_sandbox_url}}"
+							],
+							"path": [
+								"omcoreapis",
+								"1.0.2",
+								"mp",
+								"pay"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has payment status fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('transactionId');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('amount');",
+									"});",
+									"",
+									"pm.test('Status field matches our client expectations', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client maps Orange statuses to our internal statuses",
+									"    const validStatuses = ['PENDING', 'SUCCESS', 'FAILED'];",
+									"    pm.expect(validStatuses).to.include(jsonData.status);",
+									"});",
+									"",
+									"pm.test('Amount format matches our client expectation', function () {",
+									"    const jsonData = pm.response.json();",
+									"    // Our client expects amount as number (float64)",
+									"    pm.expect(jsonData.amount).to.be.a('number');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{orange_api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{orange_sandbox_url}}/omcoreapis/1.0.2/mp/status/{{orange_transaction_id}}",
+							"host": [
+								"{{orange_sandbox_url}}"
+							],
+							"path": [
+								"omcoreapis",
+								"1.0.2",
+								"mp",
+								"status",
+								"{{orange_transaction_id}}"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script for common setup",
+					"console.log('Running pre-request script for:', pm.info.requestName);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script for common validations",
+					"pm.test('Response time is acceptable', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+					"});",
+					"",
+					"pm.test('Response has valid JSON format', function () {",
+					"    pm.response.to.be.json;",
+					"});"
+				]
+			}
+		}
+	]
+}

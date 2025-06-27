@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/afrikpay/gateway/services/client/internal/models"
@@ -218,7 +219,12 @@ func (c *MTNClient) getPaymentStatus(ctx context.Context, referenceID string) (*
 		ReferenceID:   referenceID,
 		ExternalID:    mtnResp.ExternalID,
 		Status:        status,
-		Amount:        parseFloat(mtnResp.Amount),
+		Amount:        func() float64 {
+			if f, err := strconv.ParseFloat(mtnResp.Amount, 64); err == nil {
+				return f
+			}
+			return 0.0
+		}(),
 		Currency:      mtnResp.Currency,
 		TransactionID: mtnResp.FinancialTransactionID,
 		Message:       mtnResp.Reason,
@@ -446,5 +452,4 @@ func (c *OrangeClient) healthCheck(ctx context.Context) error {
 
 	return nil
 }
-
 
