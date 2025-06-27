@@ -1,0 +1,183 @@
+## 📋 Roadmap Détaillée
+
+### Phase 0 : Setup Projet & Infrastructure
+- [x] **0.1** Créer la structure de projet ✅ *Terminé le 2025-06-27 à 17:01*
+  - [x] Initialiser le repository Git
+  - [x] Créer l'arborescence des dossiers
+  - [x] Setup Go modules pour chaque service
+- [x] **0.2** Configuration centralisée ✅ *Terminé le 2025-06-27 à 17:01*
+  - [x] Créer `config/config.yml`
+  - [x] Gérer les clés JWT (publique/privée)
+  - [x] Variables d'environnement
+- [x] **0.3** Docker & Orchestration ✅ *Terminé le 2025-06-27 à 17:01*
+  - [x] `docker-compose.yml` complet
+  - [x] `Makefile` avec commandes essentielles
+  - [x] Scripts de démarrage automatique
+- [x] **0.4** Documentation initiale ✅ *Terminé le 2025-06-27 à 17:01*
+  - [x] README.md principal
+  - [x] Diagramme d'architecture
+  - [x] Guide de contribution
+
+### Phase 1 : Auth Service (JWT)
+- [x] **1.1** Tests unitaires Auth Service ✅ *Terminé le 2025-01-27 à 18:45*
+  - [x] Test génération JWT
+  - [x] Test validation JWT
+  - [x] Test expiration token
+  - [x] Test clés publique/privée
+- [ ] **1.2** Implémentation Auth Service (En cours)
+  - [ ] Structure du service Go
+  - [ ] Génération JWT avec claims
+  - [ ] Validation et parsing JWT
+  - [ ] Middleware d'authentification
+- [ ] **1.3** API REST Auth
+  - [ ] `POST /auth/login`
+  - [ ] `GET /auth/verify`
+  - [ ] `POST /auth/refresh`
+  - [ ] Gestion des erreurs
+- [ ] **1.4** Tests d'intégration Auth
+  - [ ] Tests endpoints complets
+  - [ ] Tests de sécurité
+  - [ ] Coverage > 90%
+- [ ] **1.5** Documentation Auth
+  - [ ] OpenAPI/Swagger spec
+  - [ ] Exemples d'utilisation
+  - [ ] Postman collection
+
+### Phase 2 : CRUD Service (MongoDB)
+- [ ] **2.1** Modèles de données
+  - [ ] Modèle User
+  - [ ] Modèle Wallet
+  - [ ] Modèle Transaction
+  - [ ] Validations et contraintes
+- [ ] **2.2** Tests unitaires CRUD
+  - [ ] Tests repository User
+  - [ ] Tests repository Wallet
+  - [ ] Tests repository Transaction
+  - [ ] Tests validation des données
+- [ ] **2.3** Implémentation CRUD Service
+  - [ ] Connexion MongoDB
+  - [ ] Repository pattern
+  - [ ] Service layer avec validation
+  - [ ] Middleware authentification (via Auth Service)
+- [ ] **2.4** API REST CRUD
+  - [ ] Users CRUD : `GET|POST|PUT|DELETE /users`
+  - [ ] Wallets CRUD : `GET|POST|PUT|DELETE /wallets`
+  - [ ] Transactions CRUD : `GET|POST|PUT|DELETE /transactions`
+  - [ ] Pagination et filtres
+- [ ] **2.5** Tests d'intégration CRUD
+  - [ ] Tests endpoints avec MongoDB
+  - [ ] Tests authentification JWT
+  - [ ] Tests de validation
+  - [ ] Coverage > 90%
+- [ ] **2.6** Documentation CRUD
+  - [ ] OpenAPI/Swagger spec
+  - [ ] Schémas de données
+  - [ ] Exemples de requêtes
+
+### Phase 3 : Client Module (APIs Tierces)
+- [ ] **3.1** Tests unitaires Client Module
+  - [ ] Mock Binance API
+  - [ ] Mock Bitget API
+  - [ ] Mock Mobile Money APIs
+  - [ ] Tests de resilience (retry, timeout)
+- [ ] **3.2** Implémentation Client Binance
+  - [ ] Client HTTP avec authentification
+  - [ ] `GetPrice()` pour quotes
+  - [ ] `PlaceOrder()` pour achats
+  - [ ] Gestion d'erreurs spécifiques
+- [ ] **3.3** Implémentation Client Mobile Money
+  - [ ] Client MTN Mobile Money
+  - [ ] Client Orange Money
+  - [ ] Simulation des paiements
+  - [ ] Webhooks de statut
+- [ ] **3.4** Resilience & Monitoring
+  - [ ] Circuit breaker pattern
+  - [ ] Retry avec backoff exponentiel
+  - [ ] Timeouts configurables
+  - [ ] Logs structurés
+- [ ] **3.5** Tests d'intégration Client
+  - [ ] Tests avec APIs en sandbox
+  - [ ] Tests de failover
+  - [ ] Tests de performance
+  - [ ] Coverage > 85%
+
+### Phase 4 : Temporal Service (Workflows)
+- [ ] **4.1** Setup Temporal Infrastructure
+  - [ ] Configuration PostgreSQL
+  - [ ] Démarrage Temporal Server
+  - [ ] Worker registration
+  - [ ] Namespace configuration
+- [ ] **4.2** Tests unitaires Activities
+  - [ ] Test `BinanceTradeActivity`
+  - [ ] Test `CRUDSaveTransactionActivity`
+  - [ ] Test `MobileMoneyChargeActivity`
+  - [ ] Test gestion d'erreurs retriables/non-retriables
+- [ ] **4.3** Implémentation Activities
+  - [ ] Activity pour appels CRUD Service
+  - [ ] Activity pour appels Client Module
+  - [ ] Classification des erreurs (ApplicationError)
+  - [ ] Timeouts et retry policies
+- [ ] **4.4** Tests unitaires Workflows
+  - [ ] Test `CryptoBuyWorkflow`
+  - [ ] Test `WalletDepositWorkflow`
+  - [ ] Test pattern Saga (compensation)
+  - [ ] Test scenarios d'échec
+- [ ] **4.5** Implémentation Workflows
+  - [ ] `CryptoBuyWorkflow` avec compensation
+  - [ ] `WalletDepositWorkflow` 
+  - [ ] Gestion des timeouts workflow
+  - [ ] Signal handling
+- [ ] **4.6** API REST Temporal
+  - [ ] `POST /crypto/quote`
+  - [ ] `POST /crypto/buy`
+  - [ ] `POST /wallet/deposit`
+  - [ ] `GET /workflow/{id}/status`
+- [ ] **4.7** Tests d'intégration Temporal
+  - [ ] Tests workflows end-to-end
+  - [ ] Tests de compensation
+  - [ ] Tests de concurrence
+  - [ ] Coverage > 90%
+
+### Phase 5 : Intégration & Tests E2E
+- [ ] **5.1** Tests d'intégration inter-services
+  - [ ] Auth → CRUD → Temporal flow
+  - [ ] Gestion des tokens JWT entre services
+  - [ ] Tests de communication réseau
+- [ ] **5.2** Tests End-to-End
+  - [ ] Scénario achat crypto complet
+  - [ ] Scénario recharge wallet complet
+  - [ ] Scénarios d'échec et compensation
+  - [ ] Tests de charge basiques
+- [ ] **5.3** Monitoring & Observabilité
+  - [ ] Logs centralisés (structure JSON)
+  - [ ] Métriques Temporal
+  - [ ] Health checks pour chaque service
+  - [ ] Dashboards basiques
+- [ ] **5.4** Sécurité
+  - [ ] Audit des vulnérabilités
+  - [ ] Validation des inputs
+  - [ ] Rate limiting
+  - [ ] HTTPS/TLS
+
+### Phase 6 : Documentation & Finalisation
+- [ ] **6.1** Documentation technique
+  - [ ] Architecture Decision Records (ADR)
+  - [ ] Guide de déploiement
+  - [ ] Guide de développement
+  - [ ] Troubleshooting guide
+- [ ] **6.2** Documentation utilisateur
+  - [ ] API documentation complète
+  - [ ] Postman collections finales
+  - [ ] Exemples d'intégration
+- [ ] **6.3** Packaging & Distribution
+  - [ ] Images Docker optimisées
+  - [ ] Docker Compose production-ready
+  - [ ] Scripts de migration DB
+  - [ ] Variables d'environnement documentées
+- [ ] **6.4** Tests finaux & Performance
+  - [ ] Tests de performance
+  - [ ] Tests de sécurité
+  - [ ] Coverage global > 85%
+  - [ ] Validation des exigences
+
+---

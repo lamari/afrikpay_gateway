@@ -1,0 +1,226 @@
+version: '3.8'
+
+services:
+  # ================================
+  # DATABASES
+  # ================================
+  mongodb:
+    image: mongo:7.0
+    container_name: afrikpay_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: afrikpay
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - afrikpay_network
+
+  postgresql:
+    image: postgres:15
+    container_name: afrikpay_postgresql
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: temporal
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal123
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./scripts/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - afrikpay_network
+
+  # ================================
+  # TEMPORAL INFRASTRUCTURE
+  # ================================
+  temporal:
+    image: temporalio/auto-setup:1.22.0
+    container_name: afrikpay_temporal_server
+    restart: unless-stopped
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal123
+      - POSTGRES_SEEDS=postgresql
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    volumes:
+      - ./config/temporal:/etc/temporal/config/dynamicconfig
+    depends_on:
+      - postgresql
+    networks:
+      - afrikpay_network
+
+  temporal-admin-tools:
+    image: temporalio/admin-tools:1.22.0
+    container_name: afrikpay_temporal_admin
+    restart: unless-stopped
+    environment:
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+    networks:
+      - afrikpay_network
+
+  temporal-ui:
+    image: temporalio/ui:2.21.0
+    container_name: afrikpay_temporal_ui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    depends_on:
+      - temporal
+    networks:
+      - afrikpay_network
+
+  # ================================
+  # MICROSERVICES
+  # ================================
+  auth:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    container_name: afrikpay_auth
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - JWT_PRIVATE_KEY_PATH=/app/config/keys/private.pem
+      - JWT_PUBLIC_KEY_PATH=/app/config/keys/public.pem
+      - LOG_LEVEL=debug
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    networks:
+      - afrikpay_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  crud:
+    build:
+      context: .
+      dockerfile: services/crud/Dockerfile
+    container_name: afrikpay_crud
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/afrikpay?authSource=admin
+      - JWT_PUBLIC_KEY_PATH=/app/config/keys/public.pem
+      - LOG_LEVEL=debug
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    depends_on:
+      - mongodb
+      - auth
+    networks:
+      - afrikpay_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  temporal-worker:
+    build:
+      context: .
+      dockerfile: services/temporal/Dockerfile
+    container_name: afrikpay_temporal_worker
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+      - TEMPORAL_HOST=temporal:7233
+      - CRUD_SERVICE_URL=http://crud:8002
+      - CLIENT_SERVICE_URL=http://client:8004
+      - JWT_PUBLIC_KEY_PATH=/app/config/keys/public.pem
+      - LOG_LEVEL=debug
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    depends_on:
+      - temporal
+      - crud
+    networks:
+      - afrikpay_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ================================
+  # MONITORING & OBSERVABILITY
+  # ================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: afrikpay_prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - afrikpay_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: afrikpay_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - afrikpay_network
+
+# ================================
+# NETWORKS
+# ================================
+networks:
+  afrikpay_network:
+    driver: bridge
+    name: afrikpay_network
+
+# ================================
+# VOLUMES
+# ================================
+volumes:
+  mongodb_data:
+    name: afrikpay_mongodb_data
+  postgresql_data:
+    name: afrikpay_postgresql_data
+  prometheus_data:
+    name: afrikpay_prometheus_data
+  grafana_data:
+    name: afrikpay_grafana_data

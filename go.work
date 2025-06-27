@@ -1,0 +1,9 @@
+go 1.23.0
+
+use (
+	./services/auth
+	./services/client
+	./services/crud
+	./services/temporal
+	./shared
+)

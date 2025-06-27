@@ -1,0 +1,659 @@
+# .windsurfrules - Afrikpay Gateway Project Rules
+
+# ================================
+# PROJECT OVERVIEW
+# ================================
+project:
+  name: "Afrikpay Gateway"
+  description: |
+    Microservices-based crypto gateway allowing users to:
+    - Buy cryptocurrencies (USDT/BTC) via exchange APIs (Binance, bitget)
+    - Deposit to Afrikpay wallet via Mobile Money (MTN, Orange)
+  
+  type: "microservices-architecture"
+  approach: "test-driven-development"
+  timeline: "5-10 days"
+
+# ================================
+# ARCHITECTURE
+# ================================
+architecture:
+  style: "microservices"
+  services:
+    - name: "auth"
+      purpose: "JWT authentication service (replaceable by Authentik/Keycloak)"
+      port: 8001
+      database: "none"
+      technology: "Go + JWT + RSA keys"
+    
+    - name: "crud" 
+      purpose: "CRUD operations for User/Wallet/Transaction"
+      port: 8002
+      database: "MongoDB"
+      technology: "Go + MongoDB + validation"
+    
+    - name: "temporal"
+      purpose: "Workflow orchestration with Saga pattern"
+      port: 8003
+      database: "PostgreSQL"
+      technology: "Go + Temporal + compensation"
+    
+    - name: "client"
+      purpose: "3rd party API connections with resilience patterns"
+      port: "none"
+      database: "none"
+      technology: "Go + HTTP clients + circuit breaker"
+
+  communication:
+    - "JWT tokens shared between all services"
+    - "HTTP REST APIs between services"
+    - "Temporal as external API for CRUD service"
+    - "Centralized configuration management"
+
+# ================================
+# TECHNOLOGIES & VERSIONS
+# ================================
+technology_stack:
+  primary:
+    language: "Go 1.21+"
+    workflow_engine: "Temporal"
+    authentication: "JWT with RSA keys"
+    containerization: "Docker + Docker Compose"
+    
+  databases:
+    crud: "MongoDB"
+    temporal: "PostgreSQL"
+    
+  testing:
+    framework: "Go testing + testify"
+    approach: "TDD (Test-Driven Development)"
+    coverage_target: "90%+ for business logic"
+    mocking: "testify/mock + custom mocks"
+    
+  documentation:
+    api: "OpenAPI/Swagger"
+    code: "Go doc comments"
+    architecture: "Markdown + diagrams"
+
+# ================================
+# PROJECT STRUCTURE
+# ================================
+structure:
+  root_files:
+    - "go.work"           # Go workspace
+    - "go.work.sum"       # Go workspace sum
+    - "docker-compose.yml" # Main compose file
+    - "Makefile"          # Build commands
+    - ".env.example"      # Environment variables example
+    - "README.md"         # Main documentation
+    - "ROADMAP.md"        # Project roadmap
+    
+  directories:
+    - "services/"         # All microservices
+    - "shared/"           # Shared code between services
+    - "config/"           # Centralized configuration
+    - "tests/"            # Integration tests
+    - "docs/"             # Documentation
+    - "scripts/"          # Utility scripts
+    - "deployments/"      # Deployment configs
+
+  service_structure: |
+    services/{service_name}/
+    ├── cmd/main.go                    # Entry point
+    ├── internal/
+    │   ├── config/                    # Service configuration
+    │   ├── handlers/                  # HTTP handlers
+    │   ├── middleware/                # HTTP middleware
+    │   ├── models/                    # Data models
+    │   ├── services/                  # Business logic
+    │   ├── repositories/              # Data access (if needed)
+    │   └── utils/                     # Service utilities
+    ├── api/openapi.yml                # API specification
+    ├── go.mod                         # Go module
+    ├── Makefile                       # Service commands
+    └── README.md                      # Service documentation
+
+# ================================
+# CODING STANDARDS
+# ================================
+coding_standards:
+  go:
+    style: "effective-go + go-fmt"
+    naming:
+      files: "snake_case"
+      functions: "CamelCase (public) / camelCase (private)"
+      constants: "UPPER_SNAKE_CASE"
+      interfaces: "end with 'er' suffix (e.g., Handler, Repository)"
+      structs: "CamelCase"
+      packages: "lowercase, short, descriptive"
+    
+    error_handling:
+      - "Always handle errors explicitly"
+      - "Use fmt.Errorf with %w verb for error wrapping"
+      - "Return errors as last return value"
+      - "Use custom error types for business logic errors"
+    
+    patterns:
+      - "Repository pattern for data access"
+      - "Service layer for business logic"
+      - "Interface segregation principle"
+      - "Dependency injection via constructor functions"
+      - "Factory pattern for client creation"
+
+# ================================
+# TDD APPROACH (MANDATORY)
+# ================================
+tdd_rules:
+  cycle: "RED → GREEN → REFACTOR"
+  
+  red_phase:
+    - "Write failing test first"
+    - "Test should fail for the right reason"
+    - "Only write enough test to fail"
+    
+  green_phase:
+    - "Write minimal code to make test pass"
+    - "Don't optimize yet"
+    - "Focus on making it work, not perfect"
+    
+  refactor_phase:
+    - "Improve code quality without changing behavior"
+    - "Extract common functionality"
+    - "Optimize performance if needed"
+    - "Ensure all tests still pass"
+  
+  test_naming: "TestFunctionName_Scenario_ExpectedBehavior"
+  test_structure: "Given-When-Then (Arrange-Act-Assert)"
+  
+  coverage_requirements:
+    business_logic: "90%+"
+    handlers: "85%+"
+    utilities: "80%+"
+    overall: "85%+"
+
+# ================================
+# FILE NAMING CONVENTIONS
+# ================================
+file_naming:
+  go_files:
+    implementation: "{entity}_{type}.go"
+    tests: "{entity}_{type}_test.go"
+    interfaces: "interfaces.go"
+    mocks: "{entity}_mock.go"
+    
+  examples:
+    - "user_service.go + user_service_test.go"
+    - "auth_handler.go + auth_handler_test.go"
+    - "jwt_middleware.go + jwt_middleware_test.go"
+    - "binance_client.go + binance_client_test.go"
+    
+  directories:
+    - "Use plural nouns: handlers/, models/, services/"
+    - "Use descriptive names: middleware/, repositories/, utils/"
+
+# ================================
+# API DESIGN STANDARDS
+# ================================
+api_standards:
+  rest:
+    endpoints:
+      - "Use nouns for resources: /users, /wallets, /transactions"
+      - "Use HTTP verbs: GET, POST, PUT, DELETE"
+      - "Use plural nouns: /users not /user"
+      - "Nest resources: /users/{id}/wallets"
+    
+    responses:
+      success: |
+        {
+          "success": true,
+          "data": {...},
+          "message": "Operation successful"
+        }
+      
+      error: |
+        {
+          "success": false,
+          "error": {
+            "code": "VALIDATION_ERROR",
+            "message": "Invalid input data",
+            "details": {...}
+          }
+        }
+    
+    status_codes:
+      - "200: Success"
+      - "201: Created"
+      - "400: Bad Request"
+      - "401: Unauthorized"
+      - "404: Not Found"
+      - "500: Internal Server Error"
+  
+  documentation:
+    - "Every endpoint must have OpenAPI specification"
+    - "Include request/response examples"
+    - "Document all possible error codes"
+    - "Provide Postman collections"
+
+# ================================
+# TEMPORAL WORKFLOW RULES
+# ================================
+temporal_rules:
+  patterns:
+    saga: "Use Saga pattern for distributed transactions"
+    compensation: "Every action must have compensation activity"
+    idempotency: "All activities must be idempotent"
+    
+  good_practices:
+    - "External API calls ONLY in Activities"
+    - "Workflows must be deterministic"
+    - "Use workflow.ExecuteActivity for external calls"
+    - "Implement compensation for each step"
+    - "Use proper error classification (retriable/non-retriable)"
+    
+  forbidden_practices:
+    - "NO direct HTTP calls in workflows"
+    - "NO goroutines without proper coordination"
+    - "NO non-deterministic operations in workflows"
+    - "NO database calls directly in workflows"
+    
+  activities:
+    - "Each external service call = separate Activity"
+    - "Use temporal.NewApplicationError for business errors"
+    - "Implement proper retry policies"
+    - "Configure appropriate timeouts"
+  
+  workflows:
+    crypto_buy: |
+      1. ReserveFundsActivity (compensable)
+      2. BinanceTradeActivity (compensable)
+      3. SaveTransactionActivity (compensable)
+      4. ConfirmTransaction or CompensateAll
+    
+    wallet_deposit: |
+      1. InitiateMobileMoneyActivity
+      2. WaitForWebhookSignal
+      3. CreditWalletActivity
+      4. NotifyUserActivity
+
+# ================================
+# DATABASE STANDARDS
+# ================================
+database_standards:
+  mongodb:
+    collections:
+      - "users"
+      - "wallets" 
+      - "transactions"
+    
+    naming:
+      fields: "snake_case"
+      collections: "lowercase_plural"
+    
+    indexes:
+      - "user_id on all user-related collections"
+      - "created_at for time-based queries"
+      - "status for transaction queries"
+      - "email (unique) on users collection"
+    
+    validation:
+      - "Use MongoDB schema validation"
+      - "Validate at application level too"
+      - "Required fields must be enforced"
+      
+  postgresql_temporal:
+    - "Use default Temporal schema"
+    - "No custom tables in Temporal database"
+    - "Configure proper connection pooling"
+
+# ================================
+# SECURITY REQUIREMENTS
+# ================================
+security:
+  authentication:
+    jwt:
+      algorithm: "RS256 (RSA with SHA-256)"
+      key_size: "2048 bits minimum"
+      expiration: "24 hours for access tokens"
+      refresh: "7 days for refresh tokens"
+      
+  validation:
+    input: "Validate all input data"
+    sanitization: "Sanitize user inputs"
+    sql_injection: "Use parameterized queries"
+    xss: "Escape output data"
+    
+  secrets:
+    storage: "Environment variables or secret management"
+    rotation: "Support for key rotation"
+    encryption: "Encrypt sensitive data at rest"
+    
+  headers:
+    - "Content-Type validation"
+    - "CORS configuration"
+    - "Security headers (HSTS, etc.)"
+
+# ================================
+# ERROR HANDLING
+# ================================
+error_handling:
+  go_patterns:
+    - "Return errors as last return value"
+    - "Use fmt.Errorf with %w for error wrapping"
+    - "Check errors immediately after function calls"
+    - "Don't ignore errors (use _ = if truly necessary)"
+    
+  custom_errors:
+    - "ValidationError for input validation"
+    - "AuthenticationError for auth issues"  
+    - "BusinessLogicError for business rules"
+    - "ExternalServiceError for 3rd party failures"
+    
+  temporal_errors:
+    retriable: "Network errors, temporary service unavailability"
+    non_retriable: "Invalid input, insufficient funds, authentication failures"
+    
+  logging:
+    level: "ERROR for actual errors, WARN for business exceptions"
+    format: "Structured JSON logging"
+    context: "Include request ID, user ID, operation context"
+
+# ================================
+# TESTING STRATEGIES
+# ================================
+testing:
+  unit_tests:
+    - "Test each function/method in isolation"
+    - "Use mocks for external dependencies"
+    - "Follow Given-When-Then structure"
+    - "One assertion per test when possible"
+    
+  integration_tests:
+    - "Test service endpoints with real database"
+    - "Test inter-service communication"
+    - "Use test containers for databases"
+    - "Test authentication flows"
+    
+  e2e_tests:
+    - "Test complete business scenarios"
+    - "Test crypto buy workflow end-to-end"
+    - "Test wallet deposit workflow end-to-end"
+    - "Test error scenarios and compensation"
+    
+  mocking:
+    external_apis: "Always mock 3rd party APIs in tests"
+    databases: "Use real databases in integration tests"
+    temporal: "Use Temporal test framework"
+    
+  test_data:
+    fixtures: "Use JSON fixtures for complex test data"
+    cleanup: "Clean up test data after each test"
+    isolation: "Tests must not depend on each other"
+
+# ================================
+# CONFIGURATION MANAGEMENT
+# ================================
+configuration:
+  structure:
+    main: "config/config.yml"
+    environments: "config/config.{env}.yml"
+    secrets: "Environment variables"
+    
+  sections:
+    - "services: (ports, timeouts, etc.)"
+    - "databases: (connection strings, pool sizes)"
+    - "external_apis: (URLs, timeouts, retry configs)"
+    - "jwt: (key paths, expiration times)"
+    - "logging: (level, format, output)"
+    
+  validation:
+    - "Validate configuration on startup"
+    - "Fail fast if required config is missing"
+    - "Provide sensible defaults where possible"
+    - "Document all configuration options"
+
+# ================================
+# DEPLOYMENT & DEVOPS
+# ================================
+deployment:
+  docker:
+    structure: |
+      # Multi-stage builds for Go services
+      FROM golang:1.21-alpine AS builder
+      FROM alpine:latest AS runtime
+      
+    best_practices:
+      - "Use multi-stage builds to reduce image size"
+      - "Run as non-root user"
+      - "Use .dockerignore to exclude unnecessary files"
+      - "Set proper health checks"
+      
+  docker_compose:
+    services_required:
+      - "mongodb"
+      - "postgresql" 
+      - "temporal"
+      - "auth-service"
+      - "crud-service"
+      - "temporal-service"
+      
+  makefile_commands:
+    - "make setup: Initialize project"
+    - "make start: Start all services"
+    - "make test: Run all tests"
+    - "make coverage: Generate coverage report"
+    - "make build: Build all Docker images"
+    - "make clean: Clean up environment"
+
+# ================================
+# MONITORING & OBSERVABILITY
+# ================================
+monitoring:
+  logging:
+    format: "JSON structured logging"
+    level: "INFO in production, DEBUG in development"
+    fields: "timestamp, level, service, request_id, user_id, message"
+    
+  metrics:
+    - "Request duration and count"
+    - "Error rates by endpoint"
+    - "Database connection pool metrics"
+    - "Temporal workflow metrics"
+    
+  health_checks:
+    endpoint: "/health"
+    checks:
+      - "Database connectivity"
+      - "External service availability"
+      - "Temporal worker status"
+
+# ================================
+# PERFORMANCE REQUIREMENTS
+# ================================
+performance:
+  response_times:
+    auth_endpoints: "< 100ms"
+    crud_endpoints: "< 200ms"
+    crypto_quotes: "< 500ms"
+    workflow_start: "< 100ms"
+    
+  throughput:
+    concurrent_users: "1000+"
+    requests_per_second: "500+"
+    
+  resource_limits:
+    memory: "512MB per service"
+    cpu: "0.5 CPU per service"
+    
+  caching:
+    crypto_prices: "30 seconds TTL"
+    user_sessions: "15 minutes TTL"
+    exchange_rates: "60 seconds TTL"
+
+# ================================
+# CLIENT MODULE SPECIFICATIONS
+# ================================
+client_module:
+  binance:
+    endpoints:
+      - "GET /api/v3/ticker/price (get current price)"
+      - "POST /api/v3/order (place order)"
+      - "GET /api/v3/order (check order status)"
+    
+    authentication: "API Key + Secret signature"
+    rate_limits: "Respect Binance rate limits"
+    
+  mobile_money:
+    mtn:
+      - "POST /collection/v1_0/requesttopay"
+      - "GET /collection/v1_0/requesttopay/{referenceId}"
+      
+    orange:
+      - "POST /omcoreapis/1.0.2/mp/pay"
+      - "GET /omcoreapis/1.0.2/mp/paymentstatus/{txnid}"
+  
+  resilience:
+    circuit_breaker: "Fail fast after 5 consecutive failures"
+    retry: "Exponential backoff: 1s, 2s, 4s, 8s, 16s"
+    timeout: "30s for API calls, 5s for health checks"
+
+# ================================
+# DOCUMENTATION REQUIREMENTS
+# ================================
+documentation:
+  code:
+    - "Go doc comments for all public functions"
+    - "README.md for each service"
+    - "Architecture Decision Records (ADR)"
+    - "API documentation with OpenAPI"
+    
+  architecture:
+    - "System architecture diagram"
+    - "Service interaction diagrams"
+    - "Database schema diagrams"
+    - "Temporal workflow diagrams"
+    
+  deployment:
+    - "Local development setup guide"
+    - "Production deployment guide"
+    - "Configuration reference"
+    - "Troubleshooting guide"
+
+# ================================
+# PHASE PROGRESSION RULES
+# ================================
+phases:
+  phase_0:
+    deliverables: "Project structure, Docker Compose, Makefile, Configuration"
+    validation: "make setup && make start should work"
+    
+  phase_1:
+    deliverables: "Auth Service with JWT, tests, API documentation"
+    validation: "Coverage > 90%, JWT generation/validation working"
+    
+  phase_2:
+    deliverables: "CRUD Service with MongoDB, full REST API"
+    validation: "All CRUD operations working, authenticated endpoints"
+    
+  phase_3:
+    deliverables: "Client module with resilience patterns"
+    validation: "All 3rd party APIs mockable, resilience patterns tested"
+    
+  phase_4:
+    deliverables: "Temporal Service with Saga workflows"
+    validation: "Workflows working, compensation tested"
+    
+  phase_5:
+    deliverables: "Integration tests, monitoring, security"
+    validation: "E2E scenarios passing, performance acceptable"
+    
+  phase_6:
+    deliverables: "Documentation, deployment automation"
+    validation: "Complete documentation, production-ready deployment"
+
+# ================================
+# COMMON PATTERNS TO FOLLOW
+# ================================
+patterns:
+  repository: |
+    type UserRepository interface {
+        Create(ctx context.Context, user *User) error
+        GetByID(ctx context.Context, id string) (*User, error)
+        Update(ctx context.Context, user *User) error
+        Delete(ctx context.Context, id string) error
+    }
+    
+  service: |
+    type UserService interface {
+        CreateUser(ctx context.Context, req CreateUserRequest) (*User, error)
+        GetUser(ctx context.Context, id string) (*User, error)
+    }
+    
+  handler: |
+    type UserHandler struct {
+        service UserService
+        logger  *log.Logger
+    }
+    
+    func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+        // Implementation with proper error handling and logging
+    }
+
+# ================================
+# CODE QUALITY GATES
+# ================================
+quality_gates:
+  before_commit:
+    - "All tests pass"
+    - "Code coverage meets requirements"
+    - "No linter warnings"
+    - "Go fmt applied"
+    
+  before_merge:
+    - "Integration tests pass"
+    - "API documentation updated"
+    - "Performance tests pass"
+    - "Security scan clean"
+    
+  before_release:
+    - "E2E tests pass"
+    - "Load tests pass"
+    - "Documentation complete"
+    - "Deployment tested"
+
+# ================================
+# TROUBLESHOOTING GUIDES
+# ================================
+troubleshooting:
+  common_issues:
+    - "Port conflicts: Check docker-compose ports"
+    - "Database connection: Verify MongoDB/PostgreSQL are running"
+    - "JWT issues: Check key paths and permissions"
+    - "Temporal issues: Verify Temporal server is running"
+    
+  debugging:
+    - "Use structured logging with correlation IDs"
+    - "Enable debug logging in development"
+    - "Use proper error wrapping for stack traces"
+    - "Monitor service health endpoints"
+
+# ================================
+# RULES FOR AI ASSISTANCE
+# ================================
+ai_assistance_rules:
+  approach:
+    - "Always follow TDD: tests first, then implementation"
+    - "Create complete, runnable code (no placeholders)"
+    - "Include proper error handling and logging"
+    - "Follow Go idioms and best practices"
+    
+  code_generation:
+    - "Generate complete files that can be copied directly"
+    - "Include all necessary imports"
+    - "Add comprehensive test coverage"
+    - "Include proper documentation comments"
+    
+  validation:
+    - "Ensure generated code compiles"
+    - "Verify tests pass"
+    - "Check adherence to project standards"
+    - "Validate API contracts"
