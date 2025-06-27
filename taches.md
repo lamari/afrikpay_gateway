@@ -55,10 +55,10 @@
   - [x] Correction chemins clés JWT (résolution automatique)
   - [x] Alignement codes d'erreur avec implémentation
   - [x] Validation architecture complète (HTTP server + JWT + REST)
-- [ ] **1.5** Documentation Auth
-  - [ ] OpenAPI/Swagger spec
-  - [ ] Exemples d'utilisation
-  - [ ] Postman collection
+- [x] **1.5** Documentation Auth ✅ *Terminé le 2025-06-27 à 19:55*
+  - [x] OpenAPI/Swagger spec
+  - [x] Exemples d'utilisation
+  - [x] Postman collection
 
 ### Phase 2 : CRUD Service (MongoDB)
 - [ ] **2.1** Modèles de données
