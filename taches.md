@@ -89,26 +89,60 @@
   - [x] Exemples de requêtes ✅
 
 ### Phase 3 : Client Module (APIs Tierces)
-- [ ] **3.1** Tests unitaires Client Module
+- [x] **3.0** Architecture & Setup Client ✅ *Terminé le 2025-01-27 à 23:30*
+  - [x] Structure du service Client avec Go modules
+  - [x] Configuration centralisée pour tous les clients
+  - [x] Interfaces communes (ExchangeClient, MobileMoneyClient)
+  - [x] Modèles de données partagés (QuoteResponse, OrderResponse, etc.)
+  - [x] Factory pattern pour création des clients
+  - [x] **DÉCISION ARCHITECTURALE** : Suppression complète de la couche résilience custom
+    - [x] Suppression du package `internal/resilience/` (circuit breaker, retry, timeout)
+    - [x] Simplification de tous les clients (appels HTTP directs)
+    - [x] Résilience déléguée entièrement à Temporal (retry, timeout, saga)
+- [x] **3.2.1** Implémentation Client Binance ✅ *Terminé le 2025-01-27 à 23:30*
+  - [x] Client HTTP avec authentification API Key/Secret
+  - [x] `GetQuotes()` pour récupération des prix
+  - [x] `PlaceOrder()` pour placement d'ordres
+  - [x] Conversion des formats Binance vers formats communs
+  - [x] Gestion d'erreurs spécifiques Binance
+  - [x] Helper parseFloat pour conversion prix
+  - [x] Méthodes de santé et statistiques (dépréciées)
+- [x] **3.2.2** Implémentation Client Bitget ✅ *Terminé le 2025-01-27 à 23:30*
+  - [x] Client HTTP avec authentification API Key/Secret/Passphrase
+  - [x] `GetQuotes()` pour récupération des prix
+  - [x] `PlaceOrder()` pour placement d'ordres
+  - [x] Conversion des formats Bitget vers formats communs
+  - [x] Gestion d'erreurs spécifiques Bitget
+  - [x] Méthodes de santé et statistiques (dépréciées)
+- [x] **3.3** Implémentation Client Mobile Money ✅ *Terminé le 2025-01-27 à 23:30*
+  - [x] Client MTN Mobile Money avec authentification OAuth
+  - [x] Client Orange Money avec authentification Bearer
+  - [x] `InitiatePayment()` pour initiation des paiements
+  - [x] `GetPaymentStatus()` pour suivi des statuts
+  - [x] Factory pattern avec configuration par provider
+  - [x] Gestion des webhooks de statut
+  - [x] Méthodes de santé et statistiques (dépréciées)
+- [x] **3.4** Simplification Architecture ✅ *Terminé le 2025-01-27 à 23:30*
+  - [x] **Suppression complète de la couche résilience** (circuit breaker, retry, timeout)
+  - [x] **Clients simplifiés** : Appels HTTP directs aux APIs externes
+  - [x] **Résilience via Temporal** : Retry, timeout, circuit breaker dans les workflows
+  - [x] **Logs structurés** avec contexte et erreurs détaillées
+  - [x] **Compilation réussie** : `go build ./...` passe sans erreur
+- [ ] **3.5** Tests unitaires Client Module
   - [ ] Mock Binance API
   - [ ] Mock Bitget API
   - [ ] Mock Mobile Money APIs
-  - [ ] Tests de resilience (retry, timeout)
-- [ ] **3.2** Implémentation Client Binance
-  - [ ] Client HTTP avec authentification
-  - [ ] `GetPrice()` pour quotes
-  - [ ] `PlaceOrder()` pour achats
-  - [ ] Gestion d'erreurs spécifiques
-- [ ] **3.3** Implémentation Client Mobile Money
-  - [ ] Client MTN Mobile Money
-  - [ ] Client Orange Money
-  - [ ] Simulation des paiements
-  - [ ] Webhooks de statut
-- [ ] **3.4** Resilience & Monitoring
-  - [ ] Logs structurés
-- [ ] **3.5** Tests d'intégration Client
+  - [ ] Tests des conversions de formats
+- [ ] **3.6** Tests d'intégration Client
   - [ ] Tests avec APIs en sandbox
-  - [ ] Tests de failover
+  - [ ] Tests de gestion d'erreurs
+  - [ ] Validation des authentifications
+- [] **3.7** Documentation Client 
+  - [] Collection POSTMAN vers les clients direct
+  - [] Exemples d'intégration 
+  - [] test newman 
+  - [] ajout des cmd dans make file
+  - [] documentation d'utilisation des clients
 
 ### Phase 4 : Temporal Service (Workflows)
 - [ ] **4.1** Setup Temporal Infrastructure
@@ -188,5 +222,15 @@
   - [ ] Tests de sécurité
   - [ ] Coverage global > 85%
   - [ ] Validation des exigences
+
+### Phase 7 : Démo
+- [ ] **7.1** Démo complète
+  - [ ] creation de scenario du démo dans un fichier .md
+  - [ ] creation des données de demo
+  - [ ] Présentation de l'architecture
+  - [ ] Présentation des services
+  - [ ] Présentation des tests
+  - [ ] Présentation des résultats
+  - [ ] Présentation des détails
 
 ---

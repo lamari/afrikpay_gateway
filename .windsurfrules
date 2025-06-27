@@ -39,10 +39,10 @@ architecture:
       technology: "Go + Temporal + compensation"
     
     - name: "client"
-      purpose: "3rd party API connections with resilience patterns"
+      purpose: "3rd party API connections"
       port: "none"
       database: "none"
-      technology: "Go + HTTP clients + circuit breaker"
+      technology: "Go + HTTP clients"
 
   communication:
     - "JWT tokens shared between all services"
@@ -495,25 +495,38 @@ performance:
 client_module:
   binance:
     endpoints:
-      - "GET /api/v3/ticker/price (get current price)"
-      - "POST /api/v3/order (place order)"
-      - "GET /api/v3/order (check order status)"
+      - "GET /api/exchange/binance/v1/ticker/price (get current price)"
+      - "POST /api/exchange/binance/v1/order (place order)"
+      - "GET /api/exchange/binance/v1/order (check order status)"
+      - "GET /api/exchange/binance/v1/orders (get all orders)"
+      - "GET /api/exchange/binance/v1/quotes (get all crypto quotes)"
+      - "GET /api/exchange/binance/v1/quote/{symbol} (get crypto quote)"
+    
+    authentication: "API Key + Secret signature"
+    rate_limits: "Respect Binance rate limits"
+  
+  bitget:
+    endpoints:
+      - "GET /api/exchange/bitget/v1/ticker/price (get current price)"
+      - "POST /api/exchange/bitget/v1/order (place order)"
+      - "GET /api/exchange/bitget/v1/order (check order status)"
+      - "GET /api/exchange/bitget/v1/orders (get all orders)"
+      - "GET /api/exchange/bitget/v1/quotes (get all crypto quotes)"
+      - "GET /api/exchange/bitget/v1/quote/{symbol} (get crypto quote)"
     
     authentication: "API Key + Secret signature"
     rate_limits: "Respect Binance rate limits"
     
   mobile_money:
     mtn:
-      - "POST /collection/v1_0/requesttopay"
-      - "GET /collection/v1_0/requesttopay/{referenceId}"
+      - "POST /api/mn/mtn/v1/deposit"
+      - "GET /api/mn/mtn/v1/deposit/{referenceId}"
       
     orange:
-      - "POST /omcoreapis/1.0.2/mp/pay"
-      - "GET /omcoreapis/1.0.2/mp/paymentstatus/{txnid}"
+      - "POST /api/mn/orange/v1/deposit"
+      - "GET /api/mn/orange/v1/deposit/{txnid}"
   
   resilience:
-    circuit_breaker: "Fail fast after 5 consecutive failures"
-    retry: "Exponential backoff: 1s, 2s, 4s, 8s, 16s"
     timeout: "30s for API calls, 5s for health checks"
 
 # ================================
@@ -555,8 +568,8 @@ phases:
     validation: "All CRUD operations working, authenticated endpoints"
     
   phase_3:
-    deliverables: "Client module with resilience patterns"
-    validation: "All 3rd party APIs mockable, resilience patterns tested"
+    deliverables: "Client module "
+    validation: "All 3rd party APIs mockable, patterns tested"
     
   phase_4:
     deliverables: "Temporal Service with Saga workflows"
@@ -657,3 +670,4 @@ ai_assistance_rules:
     - "Verify tests pass"
     - "Check adherence to project standards"
     - "Validate API contracts"
+
