@@ -1,0 +1,482 @@
+openapi: 3.0.3
+info:
+  title: Afrikpay Gateway - Auth Service API
+  description: |
+    Service d'authentification JWT pour la passerelle Afrikpay Gateway.
+    
+    Ce service fournit :
+    - Authentification utilisateur avec génération de tokens JWT
+    - Validation et vérification des tokens
+    - Renouvellement des tokens via refresh token
+    - Middleware d'authentification pour les autres services
+    
+    **Architecture :**
+    - Microservice autonome sur port 8001
+    - JWT signés avec clés RSA 2048 bits
+    - Support PKCS8 et PKCS1 pour les clés privées
+    - Gestion d'erreurs standardisée
+  version: 1.0.0
+  contact:
+    name: Afrikpay Gateway Team
+    email: dev@afrikpay.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8001
+    description: Serveur de développement local
+  - url: https://auth.afrikpay.com
+    description: Serveur de production
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Vérifie l'état de santé du service
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service en bonne santé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: "healthy"
+                version: "1.0.0"
+                timestamp: "2025-06-27T19:08:42.810285+01:00"
+                uptime: "4m15.809384709s"
+
+  /ready:
+    get:
+      summary: Readiness Check
+      description: Vérifie si le service est prêt à recevoir du trafic
+      operationId: readinessCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service prêt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /live:
+    get:
+      summary: Liveness Check
+      description: Vérifie si le service est vivant
+      operationId: livenessCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service vivant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /auth/login:
+    post:
+      summary: Authentification utilisateur
+      description: |
+        Authentifie un utilisateur avec email/mot de passe et retourne une paire de tokens JWT.
+        
+        **Note :** Dans cette version de démonstration, les identifiants suivants sont acceptés :
+        - Email : test@example.com
+        - Mot de passe : password123
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: "test@example.com"
+              password: "password123"
+      responses:
+        '200':
+          description: Authentification réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Requête invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_request:
+                  summary: Corps de requête invalide
+                  value:
+                    code: "INVALID_REQUEST"
+                    message: "Invalid request body"
+                    timestamp: "2025-06-27T19:08:42.810285+01:00"
+                validation_error:
+                  summary: Erreur de validation
+                  value:
+                    code: "VALIDATION_ERROR"
+                    message: "Validation failed"
+                    details: "email is required"
+                    timestamp: "2025-06-27T19:08:42.810285+01:00"
+        '401':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: "INVALID_CREDENTIALS"
+                message: "Invalid email or password"
+                timestamp: "2025-06-27T19:08:42.810285+01:00"
+        '500':
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/verify:
+    get:
+      summary: Vérification de token JWT
+      description: |
+        Vérifie la validité d'un token JWT et retourne les claims.
+        Le token doit être fourni dans le header Authorization avec le format "Bearer {token}".
+      operationId: verifyToken
+      tags:
+        - Authentication
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token valide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenClaims'
+        '401':
+          description: Token invalide ou manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_token:
+                  summary: Token manquant
+                  value:
+                    code: "MISSING_TOKEN"
+                    message: "Authorization header is required"
+                    timestamp: "2025-06-27T19:08:42.810285+01:00"
+                invalid_token:
+                  summary: Token invalide
+                  value:
+                    code: "INVALID_TOKEN"
+                    message: "Token validation failed"
+                    details: "failed to parse token: token is malformed"
+                    timestamp: "2025-06-27T19:08:42.810285+01:00"
+
+  /auth/refresh:
+    post:
+      summary: Renouvellement de token
+      description: |
+        Renouvelle un access token en utilisant un refresh token valide.
+        Retourne une nouvelle paire de tokens.
+      operationId: refreshToken
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+            example:
+              refresh_token: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Token renouvelé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+        '400':
+          description: Requête invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Refresh token invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /protected/profile:
+    get:
+      summary: Profil utilisateur (endpoint protégé exemple)
+      description: |
+        Endpoint protégé d'exemple qui retourne les informations du profil utilisateur.
+        Nécessite un token JWT valide dans le header Authorization.
+      operationId: getUserProfile
+      tags:
+        - Protected
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profil utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Token invalide ou manquant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token JWT obtenu via l'endpoint /auth/login.
+        Format: "Bearer {access_token}"
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Adresse email de l'utilisateur
+          example: "test@example.com"
+        password:
+          type: string
+          minLength: 8
+          description: Mot de passe de l'utilisateur
+          example: "password123"
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: Token JWT d'accès (durée de vie courte)
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refresh_token:
+          type: string
+          description: Token JWT de renouvellement (durée de vie longue)
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          description: Type de token
+          example: "Bearer"
+        expires_in:
+          type: integer
+          description: Durée de validité de l'access token en secondes
+          example: 86400
+        user:
+          $ref: '#/components/schemas/User'
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          description: Token de renouvellement JWT
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    RefreshTokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: Nouveau token JWT d'accès
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refresh_token:
+          type: string
+          description: Nouveau token JWT de renouvellement
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        expires_in:
+          type: integer
+          description: Durée de validité du nouveau access token en secondes
+          example: 900
+
+    TokenClaims:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: Identifiant unique de l'utilisateur
+          example: "user123"
+        email:
+          type: string
+          format: email
+          description: Adresse email de l'utilisateur
+          example: "test@example.com"
+        roles:
+          type: array
+          items:
+            type: string
+          description: Rôles de l'utilisateur
+          example: ["user"]
+        iss:
+          type: string
+          description: Émetteur du token
+          example: "afrikpay-gateway"
+        sub:
+          type: string
+          description: Sujet du token (user_id)
+          example: "user123"
+        aud:
+          type: array
+          items:
+            type: string
+          description: Audience du token
+          example: ["afrikpay-gateway"]
+        exp:
+          type: integer
+          description: Timestamp d'expiration
+          example: 1751048622
+        nbf:
+          type: integer
+          description: Timestamp "not before"
+          example: 1751047722
+        iat:
+          type: integer
+          description: Timestamp d'émission
+          example: 1751047722
+        jti:
+          type: string
+          description: Identifiant unique du token
+          example: "1f8cc77c-4454-4276-b16e-c14b60e0a686"
+
+    UserProfile:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: Identifiant unique de l'utilisateur
+          example: "user123"
+        email:
+          type: string
+          format: email
+          description: Adresse email de l'utilisateur
+          example: "test@example.com"
+        roles:
+          type: array
+          items:
+            type: string
+          description: Rôles de l'utilisateur
+          example: ["user"]
+        exp:
+          type: integer
+          description: Timestamp d'expiration du token
+          example: 1751048622
+        iat:
+          type: integer
+          description: Timestamp d'émission du token
+          example: 1751047722
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifiant unique de l'utilisateur
+          example: "user123"
+        email:
+          type: string
+          format: email
+          description: Adresse email de l'utilisateur
+          example: "test@example.com"
+        roles:
+          type: array
+          items:
+            type: string
+          description: Rôles de l'utilisateur
+          example: ["user"]
+        created_at:
+          type: string
+          format: date-time
+          description: Date de création du compte
+          example: "2025-06-27T19:04:45.247201+01:00"
+        updated_at:
+          type: string
+          format: date-time
+          description: Date de dernière mise à jour
+          example: "2025-06-27T19:04:45.247201+01:00"
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: État de santé du service
+          example: "healthy"
+        version:
+          type: string
+          description: Version du service
+          example: "1.0.0"
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp de la réponse
+          example: "2025-06-27T19:08:42.810285+01:00"
+        uptime:
+          type: string
+          description: Durée de fonctionnement du service
+          example: "4m15.809384709s"
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+        - timestamp
+      properties:
+        code:
+          type: string
+          description: Code d'erreur standardisé
+          example: "INVALID_CREDENTIALS"
+        message:
+          type: string
+          description: Message d'erreur lisible
+          example: "Invalid email or password"
+        details:
+          type: string
+          description: Détails supplémentaires sur l'erreur (optionnel)
+          example: "email is required"
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp de l'erreur
+          example: "2025-06-27T19:08:42.810285+01:00"
+
+tags:
+  - name: Health
+    description: Endpoints de monitoring et health checks
+  - name: Authentication
+    description: Endpoints d'authentification JWT
+  - name: Protected
+    description: Endpoints protégés nécessitant une authentification

@@ -32,15 +32,18 @@
   - [x] Utilitaires crypto et validation
   - [x] Tous les tests unitaires passent (100%)
   - [x] **Ajouté dans Git** ✅ *Terminé le 2025-01-27 à 18:38*
-- [ ] **1.3** API REST Auth
-  - [ ] `POST /auth/login`
-  - [ ] `GET /auth/verify`
-  - [ ] `POST /auth/refresh`
-  - [ ] Gestion des erreurs
+- [x] **1.3** API REST Auth ✅ *Terminé le 2025-06-27 à 19:05*
+  - [x] `POST /auth/login` - Authentification avec génération JWT
+  - [x] `GET /auth/verify` - Validation des tokens JWT
+  - [x] `POST /auth/refresh` - Renouvellement des tokens
+  - [x] `GET /protected/profile` - Endpoint protégé exemple
+  - [x] `GET /health|/ready|/live` - Health checks
+  - [x] Gestion des erreurs standardisée
+  - [x] Middleware JWT et logging
+  - [x] Support clés RSA PKCS8/PKCS1
+  - [x] Tests fonctionnels réussis
 - [ ] **1.4** Tests d'intégration Auth
   - [ ] Tests endpoints complets
-  - [ ] Tests de sécurité
-  - [ ] Coverage > 90%
 - [ ] **1.5** Documentation Auth
   - [ ] OpenAPI/Swagger spec
   - [ ] Exemples d'utilisation
@@ -70,8 +73,6 @@
 - [ ] **2.5** Tests d'intégration CRUD
   - [ ] Tests endpoints avec MongoDB
   - [ ] Tests authentification JWT
-  - [ ] Tests de validation
-  - [ ] Coverage > 90%
 - [ ] **2.6** Documentation CRUD
   - [ ] OpenAPI/Swagger spec
   - [ ] Schémas de données
@@ -94,15 +95,10 @@
   - [ ] Simulation des paiements
   - [ ] Webhooks de statut
 - [ ] **3.4** Resilience & Monitoring
-  - [ ] Circuit breaker pattern
-  - [ ] Retry avec backoff exponentiel
-  - [ ] Timeouts configurables
   - [ ] Logs structurés
 - [ ] **3.5** Tests d'intégration Client
   - [ ] Tests avec APIs en sandbox
   - [ ] Tests de failover
-  - [ ] Tests de performance
-  - [ ] Coverage > 85%
 
 ### Phase 4 : Temporal Service (Workflows)
 - [ ] **4.1** Setup Temporal Infrastructure

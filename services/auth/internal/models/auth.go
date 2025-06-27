@@ -67,6 +67,19 @@ func (r *RefreshTokenRequest) Validate() error {
 	return nil
 }
 
+// VerifyTokenRequest represents a token verification request
+type VerifyTokenRequest struct {
+	Token string `json:"token" validate:"required"`
+}
+
+// Validate validates the verify token request
+func (v *VerifyTokenRequest) Validate() error {
+	if v.Token == "" {
+		return fmt.Errorf("token is required")
+	}
+	return nil
+}
+
 // User represents a user in the system
 type User struct {
 	ID        string    `json:"id"`
@@ -183,4 +196,52 @@ func SanitizeInput(input string) string {
 	input = re.ReplaceAllString(input, " ")
 	
 	return input
+}
+
+// VerifyTokenResponse represents the response after token verification
+type VerifyTokenResponse struct {
+	Valid  bool   `json:"valid"`
+	UserID string `json:"user_id,omitempty"`
+	Email  string `json:"email,omitempty"`
+	Roles  []string `json:"roles,omitempty"`
+}
+
+// NewVerifyTokenResponse creates a new verify token response
+func NewVerifyTokenResponse(valid bool, userID, email string, roles []string) *VerifyTokenResponse {
+	return &VerifyTokenResponse{
+		Valid:  valid,
+		UserID: userID,
+		Email:  email,
+		Roles:  roles,
+	}
+}
+
+// RefreshTokenResponse represents the response after token refresh
+type RefreshTokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int64  `json:"expires_in"`
+}
+
+// NewRefreshTokenResponse creates a new refresh token response
+func NewRefreshTokenResponse(accessToken, refreshToken string, expiresIn int64) *RefreshTokenResponse {
+	return &RefreshTokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		TokenType:    "Bearer",
+		ExpiresIn:    expiresIn,
+	}
+}
+
+// ProfileResponse represents the response for user profile
+type ProfileResponse struct {
+	User User `json:"user"`
+}
+
+// NewProfileResponse creates a new profile response
+func NewProfileResponse(user User) *ProfileResponse {
+	return &ProfileResponse{
+		User: user,
+	}
 }

@@ -218,8 +218,8 @@ afrikpay_gateway/
 │       │   │   ├── models_test.go
 │       │   │   ├── auth.go                 # Auth Binance
 │       │   │   └── auth_test.go
-│       │   ├── 📁 coinbase/
-│       │   │   ├── client.go               # Client Coinbase
+│       │   ├── 📁 bitget/
+│       │   │   ├── client.go               # Client bitget
 │       │   │   ├── client_test.go
 │       │   │   ├── models.go
 │       │   │   ├── models_test.go
@@ -262,12 +262,12 @@ afrikpay_gateway/
 │       │   │       └── logger_test.go
 │       │   └── 📁 mocks/
 │       │       ├── binance_mock.go         # Mocks pour tests
-│       │       ├── coinbase_mock.go
+│       │       ├── bitget_mock.go
 │       │       ├── mtn_mock.go
 │       │       └── orange_mock.go
 │       ├── 📁 examples/
 │       │   ├── binance_example.go          # Exemples d'utilisation
-│       │   ├── coinbase_example.go
+│       │   ├── bitget_example.go
 │       │   ├── mtn_example.go
 │       │   └── orange_example.go
 │       ├── go.mod
@@ -479,7 +479,7 @@ afrikpay_gateway/
 #### 🌐 **Client Module**
 - **Responsabilité** : Connexions APIs tierces
 - **Technologies** : HTTP clients + resilience patterns
-- **APIs** : Binance, Coinbase, MTN, Orange
+- **APIs** : Binance, bitget, MTN, Orange
 - **Tests** : 25+ fichiers de tests
 
 ### **Code Partagé**

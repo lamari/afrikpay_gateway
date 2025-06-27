@@ -16,8 +16,9 @@ Tu es maintenant l'architecte principal du projet Afrikpay Gateway. Ta mission e
 4. Développe avec TDD strict : RED → GREEN → REFACTOR
 5. Teste et valide selon les critères définis
 6. Marque la tâche terminée dans taches.md avec [x] et la date/heure
-7. Passe automatiquement à la tâche suivante
-8. Répète jusqu'à completion du projet
+7. Commit et push les modifications
+8. Passe automatiquement à la tâche suivante
+9. Répète jusqu'à completion du projet
 
 ⚡ ACTION IMMÉDIATE :
 Commence par la Phase 0.1 : "Créer la structure de projet"

@@ -73,8 +73,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// RefreshToken handles token refresh requests
-func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
+// Refresh handles token refresh requests
+func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var refreshReq models.RefreshTokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&refreshReq); err != nil {
@@ -101,8 +101,8 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newTokenPair)
 }
 
-// VerifyToken handles token verification requests
-func (h *AuthHandler) VerifyToken(w http.ResponseWriter, r *http.Request) {
+// Verify handles token verification requests
+func (h *AuthHandler) Verify(w http.ResponseWriter, r *http.Request) {
 	// Get token from Authorization header
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -137,6 +137,29 @@ func (h *AuthHandler) validateCredentials(email, password string) bool {
 	// In a real implementation, this would check against a database
 	// For testing purposes, we'll accept any valid email with password "password123"
 	return email != "" && password == "password123"
+}
+
+// Profile handles protected profile requests (example endpoint)
+func (h *AuthHandler) Profile(w http.ResponseWriter, r *http.Request) {
+	// Get claims from context (set by auth middleware)
+	claims, ok := r.Context().Value("claims").(*models.CustomClaims)
+	if !ok {
+		h.writeErrorResponse(w, http.StatusUnauthorized, "MISSING_CLAIMS", "Claims not found in context", "")
+		return
+	}
+
+	// Create profile response
+	profile := map[string]interface{}{
+		"user_id": claims.UserID,
+		"email":   claims.Email,
+		"roles":   claims.Roles,
+		"exp":     claims.ExpiresAt,
+		"iat":     claims.IssuedAt,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(profile)
 }
 
 // writeErrorResponse writes an error response to the HTTP response writer

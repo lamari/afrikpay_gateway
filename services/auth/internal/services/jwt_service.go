@@ -39,15 +39,29 @@ type jwtService struct {
 }
 
 // NewJWTService creates a new JWT service
-func NewJWTService(issuer, audience string, accessTokenTTL time.Duration) JWTService {
+func NewJWTService(issuer, audience string, accessTokenTTL time.Duration, privateKeyPath, publicKeyPath string) (JWTService, error) {
+	// Load private key
+	privateKey, err := loadPrivateKey(privateKeyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load private key: %w", err)
+	}
+
+	// Load public key
+	publicKey, err := loadPublicKey(publicKeyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load public key: %w", err)
+	}
+
 	refreshTokenTTL := accessTokenTTL * 24 // Refresh token lasts 24x longer
 	return &jwtService{
+		privateKey:      privateKey,
+		publicKey:       publicKey,
 		issuer:          issuer,
 		audience:        audience,
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
 		revokedTokens:   make(map[string]bool),
-	}
+	}, nil
 }
 
 // LoadKeys loads RSA private and public keys from PEM files
@@ -324,6 +338,63 @@ func (s *jwtService) GetPublicKey() *rsa.PublicKey {
 // GetPrivateKey returns the private key (for testing purposes only)
 func (s *jwtService) GetPrivateKey() *rsa.PrivateKey {
 	return s.privateKey
+}
+
+// loadPrivateKey loads an RSA private key from a PEM file
+func loadPrivateKey(keyPath string) (*rsa.PrivateKey, error) {
+	keyData, err := os.ReadFile(keyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read private key file: %w", err)
+	}
+
+	block, _ := pem.Decode(keyData)
+	if block == nil {
+		return nil, fmt.Errorf("failed to decode PEM block containing private key")
+	}
+
+	// Try PKCS8 first, then PKCS1
+	privateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		// Try PKCS1 format
+		pkcs1Key, err2 := x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err2 != nil {
+			return nil, fmt.Errorf("failed to parse private key (tried PKCS8 and PKCS1): %w", err)
+		}
+		return pkcs1Key, nil
+	}
+
+	// Convert to RSA private key if it's PKCS8
+	rsaKey, ok := privateKey.(*rsa.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("private key is not an RSA key")
+	}
+
+	return rsaKey, nil
+}
+
+// loadPublicKey loads an RSA public key from a PEM file
+func loadPublicKey(keyPath string) (*rsa.PublicKey, error) {
+	keyData, err := os.ReadFile(keyPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read public key file: %w", err)
+	}
+
+	block, _ := pem.Decode(keyData)
+	if block == nil {
+		return nil, fmt.Errorf("failed to decode PEM block containing public key")
+	}
+
+	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse public key: %w", err)
+	}
+
+	rsaPublicKey, ok := publicKey.(*rsa.PublicKey)
+	if !ok {
+		return nil, fmt.Errorf("key is not an RSA public key")
+	}
+
+	return rsaPublicKey, nil
 }
 
 // MockJWTService for testing
