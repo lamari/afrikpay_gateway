@@ -42,8 +42,19 @@
   - [x] Middleware JWT et logging
   - [x] Support clés RSA PKCS8/PKCS1
   - [x] Tests fonctionnels réussis
-- [ ] **1.4** Tests d'intégration Auth
-  - [ ] Tests endpoints complets
+- [x] **1.4** Tests d'intégration Auth ✅ *Terminé le 2025-06-27 à 19:48*
+  - [x] Tests endpoints complets (8/8 tests passants)
+  - [x] TestAuthIntegration_LoginFlow - Flux de connexion complet
+  - [x] TestAuthIntegration_VerifyTokenFlow - Vérification tokens JWT
+  - [x] TestAuthIntegration_RefreshTokenFlow - Renouvellement tokens
+  - [x] TestAuthIntegration_ProtectedEndpoint - Endpoints protégés
+  - [x] TestAuthIntegration_ProtectedEndpointUnauthorized - Accès non autorisé
+  - [x] TestAuthIntegration_HealthEndpoints - Health checks
+  - [x] TestAuthIntegration_InvalidToken - Gestion tokens invalides
+  - [x] TestAuthIntegration_SecurityHeaders - Headers de sécurité
+  - [x] Correction chemins clés JWT (résolution automatique)
+  - [x] Alignement codes d'erreur avec implémentation
+  - [x] Validation architecture complète (HTTP server + JWT + REST)
 - [ ] **1.5** Documentation Auth
   - [ ] OpenAPI/Swagger spec
   - [ ] Exemples d'utilisation
