@@ -24,11 +24,14 @@
   - [x] Test validation JWT
   - [x] Test expiration token
   - [x] Test clés publique/privée
-- [ ] **1.2** Implémentation Auth Service (En cours)
-  - [ ] Structure du service Go
-  - [ ] Génération JWT avec claims
-  - [ ] Validation et parsing JWT
-  - [ ] Middleware d'authentification
+- [x] **1.2** Implémentation Auth Service ✅ *Terminé le 2025-01-27 à 18:45*
+  - [x] Structure du service Go
+  - [x] Génération JWT avec claims
+  - [x] Validation et parsing JWT
+  - [x] Middleware d'authentification
+  - [x] Utilitaires crypto et validation
+  - [x] Tous les tests unitaires passent (100%)
+  - [x] **Ajouté dans Git** ✅ *Terminé le 2025-01-27 à 18:38*
 - [ ] **1.3** API REST Auth
   - [ ] `POST /auth/login`
   - [ ] `GET /auth/verify`
