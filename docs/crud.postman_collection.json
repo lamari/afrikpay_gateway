@@ -1,0 +1,273 @@
+{
+  "info": {
+    "name": "Afrikpay CRUD Service",
+    "description": "Collection pour tester les endpoints CRUD du service Afrikpay Gateway",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8002",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Health check returns 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"user_test_001\",\n  \"email\": \"testuser@example.com\",\n  \"role\": \"user\",\n  \"password_hash\": \"$2a$10$N9qo8uLOickgx2ZMRZoMye.IjZGqGqGqGqGqGqGqGqGqGqGqGqGqGq\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users",
+          "host": ["{{base_url}}"],
+          "path": ["users"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('User created successfully', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response contains user data', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('email');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get User",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/user_test_001",
+          "host": ["{{base_url}}"],
+          "path": ["users", "user_test_001"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('User retrieved successfully', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('User data is correct', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id).to.eql('user_test_001');",
+              "    pm.expect(jsonData.email).to.eql('testuser@example.com');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Wallet",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"wallet_test_001\",\n  \"user_id\": \"user_test_001\",\n  \"balance\": 100.50,\n  \"currency\": \"USDT\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/wallets",
+          "host": ["{{base_url}}"],
+          "path": ["wallets"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Wallet created successfully', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response contains wallet data', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('user_id');",
+              "    pm.expect(jsonData).to.have.property('balance');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Wallet",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/wallets/wallet_test_001",
+          "host": ["{{base_url}}"],
+          "path": ["wallets", "wallet_test_001"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Wallet retrieved successfully', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Wallet data is correct', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id).to.eql('wallet_test_001');",
+              "    pm.expect(jsonData.user_id).to.eql('user_test_001');",
+              "    pm.expect(jsonData.balance).to.eql(100.50);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Transaction",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"txn_test_001\",\n  \"wallet_id\": \"wallet_test_001\",\n  \"amount\": 25.75,\n  \"type\": \"deposit\",\n  \"status\": \"success\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/transactions",
+          "host": ["{{base_url}}"],
+          "path": ["transactions"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Transaction created successfully', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response contains transaction data', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('wallet_id');",
+              "    pm.expect(jsonData).to.have.property('amount');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Transaction",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/transactions/txn_test_001",
+          "host": ["{{base_url}}"],
+          "path": ["transactions", "txn_test_001"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Transaction retrieved successfully', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Transaction data is correct', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id).to.eql('txn_test_001');",
+              "    pm.expect(jsonData.wallet_id).to.eql('wallet_test_001');",
+              "    pm.expect(jsonData.amount).to.eql(25.75);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

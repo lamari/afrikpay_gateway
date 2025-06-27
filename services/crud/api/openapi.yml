@@ -1,0 +1,154 @@
+openapi: 3.0.3
+info:
+  title: Afrikpay CRUD Service API
+  version: 0.1.0
+  description: |
+    REST API for managing Users, Wallets and Transactions.
+servers:
+  - url: http://localhost:8002
+paths:
+  /users:
+    post:
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+        '404': { description: Not found }
+    put:
+      summary: Update user
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200': { description: Updated }
+    delete:
+      summary: Delete user
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '204': { description: No content }
+  /wallets:
+    post:
+      summary: Create wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Wallet'
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Wallet' } } } }
+  /wallets/{id}:
+    get:
+      summary: Get wallet by ID
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Wallet' } } } }
+        '404': { description: Not found }
+    put:
+      summary: Update wallet
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Wallet'
+      responses:
+        '200': { description: Updated }
+    delete:
+      summary: Delete wallet
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '204': { description: No content }
+  /transactions:
+    post:
+      summary: Create transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Transaction' } } } }
+  /transactions/{id}:
+    get:
+      summary: Get transaction by ID
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Transaction' } } } }
+        '404': { description: Not found }
+    put:
+      summary: Update transaction
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '200': { description: Updated }
+    delete:
+      summary: Delete transaction
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '204': { description: No content }
+components:
+  parameters:
+    ID:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string }
+        role: { type: string }
+        password_hash: { type: string }
+      required: [id, email, role]
+    Wallet:
+      type: object
+      properties:
+        id: { type: string }
+        user_id: { type: string }
+        balance: { type: number, format: double }
+        currency: { type: string }
+      required: [id, user_id, currency]
+    Transaction:
+      type: object
+      properties:
+        id: { type: string }
+        wallet_id: { type: string }
+        amount: { type: number, format: double }
+        type: { type: string }
+        status: { type: string }
+      required: [id, wallet_id, amount, type]

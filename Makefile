@@ -77,10 +77,17 @@ test-auth: ## Run auth service tests
 	@echo "🧪 Testing auth service..."
 	cd services/auth && go test -v ./...
 
-test-crud: ## Run crud service tests
-	@echo "🧪 Testing crud service..."
+test-crud: ## Run crud unit tests
+	@echo "🧪 Testing crud service (unit)..."
 	cd services/crud && go test -v ./...
 
+test-crud-int: ## Run crud integration tests (requires Docker)
+	@echo "🧪 Testing crud service (integration)..."
+	cd services/crud && go test -v -tags=integration ./...
+
+postman-crud: ## Run Postman collection via Newman
+	@echo "📬 Running Postman CRUD collection..."
+	newman run docs/crud.postman_collection.json --env-var base_url=http://localhost:8002
 test-temporal: ## Run temporal service tests
 	@echo "🧪 Testing temporal service..."
 	cd services/temporal && go test -v ./...

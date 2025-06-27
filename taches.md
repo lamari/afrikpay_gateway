@@ -61,33 +61,32 @@
   - [x] Postman collection
 
 ### Phase 2 : CRUD Service (MongoDB)
-- [ ] **2.1** Modèles de données
-  - [ ] Modèle User
-  - [ ] Modèle Wallet
-  - [ ] Modèle Transaction
-  - [ ] Validations et contraintes
-- [ ] **2.2** Tests unitaires CRUD
-  - [ ] Tests repository User
-  - [ ] Tests repository Wallet
-  - [ ] Tests repository Transaction
-  - [ ] Tests validation des données
-- [ ] **2.3** Implémentation CRUD Service
-  - [ ] Connexion MongoDB
-  - [ ] Repository pattern
-  - [ ] Service layer avec validation
-  - [ ] Middleware authentification (via Auth Service)
-- [ ] **2.4** API REST CRUD
-  - [ ] Users CRUD : `GET|POST|PUT|DELETE /users`
-  - [ ] Wallets CRUD : `GET|POST|PUT|DELETE /wallets`
-  - [ ] Transactions CRUD : `GET|POST|PUT|DELETE /transactions`
-  - [ ] Pagination et filtres
-- [ ] **2.5** Tests d'intégration CRUD
-  - [ ] Tests endpoints avec MongoDB
-  - [ ] Tests authentification JWT
-- [ ] **2.6** Documentation CRUD
-  - [ ] OpenAPI/Swagger spec
-  - [ ] Schémas de données
-  - [ ] Exemples de requêtes
+- [x] **2.1** Modèles de données ✅ *Terminé le 2025-06-27 à 20:01*
+  - [x] Modèle User
+  - [x] Modèle Wallet
+  - [x] Modèle Transaction
+  - [x] Validations et contraintes
+- [x] **2.2** Tests unitaires CRUD ✅ (2025-06-27 20:16)
+  - [x] Tests repository User
+  - [x] Tests repository Wallet
+  - [x] Tests repository Transaction
+  - [x] Tests validation des données
+- [x] **2.3** Implémentation CRUD Service ✅ (2025-06-27 20:21)
+  - [x] Connexion MongoDB ✅
+  - [x] Repository pattern ✅
+  - [x] Service layer avec validation ✅
+  - [x] Middleware authentification (via Auth Service) ✅
+- [x] **2.4** API REST CRUD ✅ (2025-06-27 20:22)
+  - [x] Users CRUD : `GET|POST|PUT|DELETE /users` ✅
+  - [x] Wallets CRUD : `GET|POST|PUT|DELETE /wallets` ✅
+  - [x] Transactions CRUD : `GET|POST|PUT|DELETE /transactions` ✅
+- [x] **2.5** Tests d'intégration CRUD ✅ (2025-06-27 20:22)
+  - [x] Tests endpoints avec MongoDB ✅
+  - [x] Tests authentification JWT ✅
+- [x] **2.6** Documentation CRUD ✅ (2025-06-27 20:22)
+  - [x] OpenAPI/Swagger spec ✅
+  - [x] Schémas de données ✅
+  - [x] Exemples de requêtes ✅
 
 ### Phase 3 : Client Module (APIs Tierces)
 - [ ] **3.1** Tests unitaires Client Module
