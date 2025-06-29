@@ -1,0 +1,82 @@
+{
+  "id": "api-clients-env",
+  "name": "API Clients Environment",
+  "values": [
+    {
+      "key": "binance_base_url",
+      "value": "https://testnet.binance.vision",
+      "enabled": true
+    },
+    {
+      "key": "binance_api_key",
+      "value": "Bjhd5FsunILOwVT1RXJiUxOhZt7MQ2jydKs2jspF11kB6tv1xY3EAmDJvrR4w8la",
+      "enabled": true
+    },
+    {
+      "key": "binance_api_secret",
+      "value": "LIWTukFxAjUH43qx7upKrADY1q8Ogc46OLMbeqgsv98noMvV7mWkGeseKtgUmbtC",
+      "enabled": true
+    },
+    {
+      "key": "bitget_base_url",
+      "value": "https://api.bitget.com",
+      "enabled": true
+    },
+    {
+      "key": "bitget_api_key",
+      "value": "bg_688e18af62fd23f63256cda0e25cc6e9",
+      "enabled": true
+    },
+    {
+      "key": "bitget_api_secret",
+      "value": "37b51bfea417288f91bc08cd38a9a9c41e92c1ce0bf686ebbca833eafa2f32d5",
+      "enabled": true
+    },
+    {
+      "key": "bitget_passphrase",
+      "value": "afrikpaygateway",
+      "enabled": true
+    },
+    {
+      "key": "mtn_base_url",
+      "value": "https://sandbox.momodeveloper.mtn.com",
+      "enabled": true
+    },
+    {
+      "key": "mtn_primary_key",
+      "value": "1ab732916da44b82be43abf6d6d17b47",
+      "enabled": true
+    },
+    {
+      "key": "mtn_secondary_key",
+      "value": "6607bfe1797e449c8b0e5ed45121ad3d",
+      "enabled": true
+    },
+    {
+      "key": "orange_base_url",
+      "value": "https://api.orange.com/orange-money-webpay/dev/v1",
+      "enabled": true
+    },
+    {
+      "key": "orange_client_id",
+      "value": "LNAzgV2wqco8pwbx8iKPbAM5C2qyAzHB",
+      "enabled": true
+    },
+    {
+      "key": "orange_client_secret",
+      "value": "NTOIQfmN22APwNcoCPBKBbexsHpOIwxTxVDaZYu7smOf",
+      "enabled": true
+    },
+    {
+      "key": "orange_authorization",
+      "value": "Basic TE5BemdWMndxY284cHdieDhpS1BiQU01QzJxeUF6SEI6TlRPSVFmbU4yMkFQd05jb0NQQktCYmV4c0hwT0l3eFR4VkRhWll1N3NtT2Y=",
+      "enabled": true
+    },
+    {
+      "key": "crud_base_url",
+      "value": "http://localhost:8002",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

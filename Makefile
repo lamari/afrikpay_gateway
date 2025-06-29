@@ -55,6 +55,10 @@ build-auth: ## Build auth service only
 	@echo "🔨 Building auth service..."
 	cd services/auth && go build -o ../../bin/auth ./cmd/main.go
 
+run-auth-local: ## Run auth service locally with go run
+	@echo "🚀 Running auth service locally..."
+	services/auth/run_local.sh
+
 build-crud: ## Build crud service only
 	@echo "🔨 Building crud service..."
 	cd services/crud && go build -o ../../bin/crud ./cmd/main.go
@@ -85,9 +89,14 @@ test-crud-int: ## Run crud integration tests (requires Docker)
 	@echo "🧪 Testing crud service (integration)..."
 	cd services/crud && go test -v -tags=integration ./...
 
-postman-crud: ## Run Postman collection via Newman
+postman-crud: ## Run Postman CRUD collection via Newman
 	@echo "📬 Running Postman CRUD collection..."
-	newman run docs/crud.postman_collection.json --env-var base_url=http://localhost:8002
+	newman run postman/collections/crud_service.json --env-var baseUrl=http://localhost:8002
+
+postman-auth: ## Run Postman Auth collection via Newman
+	@echo "📬 Running Postman Auth collection..."
+	newman run postman/collections/auth_service.json --env-var baseUrl=http://localhost:8001
+	
 test-temporal: ## Run temporal service tests
 	@echo "🧪 Testing temporal service..."
 	cd services/temporal && go test -v ./...

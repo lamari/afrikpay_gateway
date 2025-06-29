@@ -12,6 +12,7 @@ import (
 type WalletRepository interface {
     Create(ctx context.Context, w *models.Wallet) error
     GetByID(ctx context.Context, id string) (*models.Wallet, error)
+    GetByUserIDAndCurrency(ctx context.Context, userID string, currency string) (*models.Wallet, error)
     Update(ctx context.Context, w *models.Wallet) error
     Delete(ctx context.Context, id string) error
 }
@@ -66,4 +67,18 @@ func (r *InMemoryWalletRepository) Delete(_ context.Context, id string) error {
     }
     delete(r.store, id)
     return nil
+}
+
+func (r *InMemoryWalletRepository) GetByUserIDAndCurrency(_ context.Context, userID string, currency string) (*models.Wallet, error) {
+    r.mu.RLock()
+    defer r.mu.RUnlock()
+    
+    for _, wallet := range r.store {
+        if wallet.UserID == userID && wallet.Currency == currency {
+            cp := *wallet
+            return &cp, nil
+        }
+    }
+    
+    return nil, ErrNotFound
 }

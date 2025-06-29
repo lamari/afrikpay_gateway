@@ -45,3 +45,19 @@ func (r *MongoWalletRepository) Delete(ctx context.Context, id string) error {
     }
     return nil
 }
+
+// GetByUserIDAndCurrency retrieves a wallet by user ID and currency
+func (r *MongoWalletRepository) GetByUserIDAndCurrency(ctx context.Context, userID string, currency string) (*models.Wallet, error) {
+    var result models.Wallet
+    filter := bson.M{
+        "userid": userID,
+        "currency": currency,
+    }
+    
+    err := r.col.FindOne(ctx, filter).Decode(&result)
+    if err == mongo.ErrNoDocuments {
+        return nil, ErrNotFound
+    }
+    
+    return &result, err
+}

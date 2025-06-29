@@ -1,0 +1,12 @@
+frontend.enableClientVersionCheck:
+  - value: true
+    constraints: {}
+history.defaultWorkflowRetentionInDays:
+  - value: 3
+    constraints: {}
+system.forceSearchAttributesCacheRefreshOnRead:
+  - value: true
+    constraints: {}
+limit.maxIDLength:
+  - value: 255
+    constraints: {}

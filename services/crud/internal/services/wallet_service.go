@@ -32,3 +32,8 @@ func (s *WalletService) Update(ctx context.Context, w *models.Wallet) error {
 func (s *WalletService) Delete(ctx context.Context, id string) error {
     return s.Repo.Delete(ctx, id)
 }
+
+// GetByUserIdAndCurrency retrieves a wallet by user ID and currency
+func (s *WalletService) GetByUserIdAndCurrency(ctx context.Context, userId string, currency string) (*models.Wallet, error) {
+    return s.Repo.GetByUserIDAndCurrency(ctx, userId, currency)
+}

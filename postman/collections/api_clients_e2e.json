@@ -1,0 +1,618 @@
+{
+  "info": {
+    "name": "Afrikpay Gateway - API Clients E2E",
+    "description": "Collection for testing all external API clients used in E2E tests: Binance, Bitget, MTN MoMo, Orange Money",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variables": [
+    {
+      "key": "binance_base_url",
+      "value": "https://testnet.binance.vision",
+      "type": "string"
+    },
+    {
+      "key": "binance_api_key",
+      "value": "Bjhd5FsunILOwVT1RXJiUxOhZt7MQ2jydKs2jspF11kB6tv1xY3EAmDJvrR4w8la",
+      "type": "string"
+    },
+    {
+      "key": "binance_api_secret",
+      "value": "LIWTukFxAjUH43qx7upKrADY1q8Ogc46OLMbeqgsv98noMvV7mWkGeseKtgUmbtC",
+      "type": "string"
+    },
+    {
+      "key": "bitget_base_url",
+      "value": "https://api.bitget.com",
+      "type": "string"
+    },
+    {
+      "key": "bitget_api_key",
+      "value": "bg_688e18af62fd23f63256cda0e25cc6e9",
+      "type": "string"
+    },
+    {
+      "key": "bitget_api_secret",
+      "value": "37b51bfea417288f91bc08cd38a9a9c41e92c1ce0bf686ebbca833eafa2f32d5",
+      "type": "string"
+    },
+    {
+      "key": "bitget_passphrase",
+      "value": "afrikpaygateway",
+      "type": "string"
+    },
+    {
+      "key": "mtn_base_url",
+      "value": "https://sandbox.momodeveloper.mtn.com",
+      "type": "string"
+    },
+    {
+      "key": "mtn_primary_key",
+      "value": "1ab732916da44b82be43abf6d6d17b47",
+      "type": "string"
+    },
+    {
+      "key": "mtn_secondary_key",
+      "value": "6607bfe1797e449c8b0e5ed45121ad3d",
+      "type": "string"
+    },
+    {
+      "key": "orange_base_url",
+      "value": "https://api.orange.com/orange-money-webpay/dev/v1",
+      "type": "string"
+    },
+    {
+      "key": "orange_client_id",
+      "value": "LNAzgV2wqco8pwbx8iKPbAM5C2qyAzHB",
+      "type": "string"
+    },
+    {
+      "key": "orange_client_secret",
+      "value": "NTOIQfmN22APwNcoCPBKBbexsHpOIwxTxVDaZYu7smOf",
+      "type": "string"
+    },
+    {
+      "key": "orange_authorization",
+      "value": "Basic TE5BemdWMndxY284cHdieDhpS1BiQU01QzJxeUF6SEI6TlRPSVFmbU4yMkFQd05jb0NQQktCYmV4c0hwT0l3eFR4VkRhWll1N3NtT2Y=",
+      "type": "string"
+    },
+    {
+      "key": "crud_base_url",
+      "value": "http://localhost:8002",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🪙 Binance API Tests",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{binance_base_url}}/api/v3/ping",
+              "host": ["{{binance_base_url}}"],
+              "path": ["api", "v3", "ping"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Price - BTCUSDT",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{binance_base_url}}/api/v3/ticker/price?symbol=BTCUSDT",
+              "host": ["{{binance_base_url}}"],
+              "path": ["api", "v3", "ticker", "price"],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quote - BTCUSDT",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{binance_base_url}}/api/v3/ticker/24hr?symbol=BTCUSDT",
+              "host": ["{{binance_base_url}}"],
+              "path": ["api", "v3", "ticker", "24hr"],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Multiple Quotes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{binance_base_url}}/api/v3/ticker/24hr?symbols=[\"BTCUSDT\",\"ETHUSDT\"]",
+              "host": ["{{binance_base_url}}"],
+              "path": ["api", "v3", "ticker", "24hr"],
+              "query": [
+                {
+                  "key": "symbols",
+                  "value": "[\"BTCUSDT\",\"ETHUSDT\"]"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Place Test Order (Will Fail in Testnet)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-MBX-APIKEY",
+                "value": "{{binance_api_key}}"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                },
+                {
+                  "key": "side",
+                  "value": "BUY"
+                },
+                {
+                  "key": "type",
+                  "value": "MARKET"
+                },
+                {
+                  "key": "quantity",
+                  "value": "0.001"
+                },
+                {
+                  "key": "timestamp",
+                  "value": "{{$timestamp}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{binance_base_url}}/api/v3/order/test",
+              "host": ["{{binance_base_url}}"],
+              "path": ["api", "v3", "order", "test"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔥 Bitget API Tests",
+      "item": [
+        {
+          "name": "Health Check (Server Time)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{bitget_base_url}}/api/spot/v1/public/time",
+              "host": ["{{bitget_base_url}}"],
+              "path": ["api", "spot", "v1", "public", "time"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Price - BTCUSDT_SPBL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{bitget_base_url}}/api/spot/v1/market/ticker?symbol=BTCUSDT_SPBL",
+              "host": ["{{bitget_base_url}}"],
+              "path": ["api", "spot", "v1", "market", "ticker"],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT_SPBL"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Price - Alternative BTCUSDT",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{bitget_base_url}}/api/spot/v1/market/ticker?symbol=BTCUSDT",
+              "host": ["{{bitget_base_url}}"],
+              "path": ["api", "spot", "v1", "market", "ticker"],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tickers (Quotes)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{bitget_base_url}}/api/spot/v1/market/tickers",
+              "host": ["{{bitget_base_url}}"],
+              "path": ["api", "spot", "v1", "market", "tickers"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Place Order (Will Fail - Test Environment)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "ACCESS-KEY",
+                "value": "{{bitget_api_key}}"
+              },
+              {
+                "key": "ACCESS-PASSPHRASE",
+                "value": "{{bitget_passphrase}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"symbol\": \"BTCUSDT_SPBL\",\n  \"side\": \"buy\",\n  \"orderType\": \"market\",\n  \"size\": \"10\",\n  \"clientOrderId\": \"test-{{$timestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{bitget_base_url}}/api/spot/v1/trade/order",
+              "host": ["{{bitget_base_url}}"],
+              "path": ["api", "spot", "v1", "trade", "order"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "💳 MTN Mobile Money Tests",
+      "item": [
+        {
+          "name": "Health Check (Collections)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Ocp-Apim-Subscription-Key",
+                "value": "{{mtn_primary_key}}"
+              }
+            ],
+            "url": {
+              "raw": "{{mtn_base_url}}/collection/",
+              "host": ["{{mtn_base_url}}"],
+              "path": ["collection", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Account Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Ocp-Apim-Subscription-Key",
+                "value": "{{mtn_primary_key}}"
+              },
+              {
+                "key": "X-Target-Environment",
+                "value": "sandbox"
+              }
+            ],
+            "url": {
+              "raw": "{{mtn_base_url}}/collection/v1_0/account/balance",
+              "host": ["{{mtn_base_url}}"],
+              "path": ["collection", "v1_0", "account", "balance"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request to Pay (Sandbox)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Ocp-Apim-Subscription-Key",
+                "value": "{{mtn_primary_key}}"
+              },
+              {
+                "key": "X-Target-Environment",
+                "value": "sandbox"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Reference-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": \"100\",\n  \"currency\": \"EUR\",\n  \"externalId\": \"test-{{$timestamp}}\",\n  \"payer\": {\n    \"partyIdType\": \"MSISDN\",\n    \"partyId\": \"256774290781\"\n  },\n  \"payerMessage\": \"Test payment from Afrikpay Gateway\",\n  \"payeeNote\": \"Payment for crypto purchase\"\n}"
+            },
+            "url": {
+              "raw": "{{mtn_base_url}}/collection/v1_0/requesttopay",
+              "host": ["{{mtn_base_url}}"],
+              "path": ["collection", "v1_0", "requesttopay"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Ocp-Apim-Subscription-Key",
+                "value": "{{mtn_primary_key}}"
+              },
+              {
+                "key": "X-Target-Environment",
+                "value": "sandbox"
+              }
+            ],
+            "url": {
+              "raw": "{{mtn_base_url}}/collection/v1_0/requesttopay/test-transaction-id",
+              "host": ["{{mtn_base_url}}"],
+              "path": ["collection", "v1_0", "requesttopay", "test-transaction-id"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🍊 Orange Money Tests",
+      "item": [
+        {
+          "name": "Health Check (Get Token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{orange_authorization}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{orange_base_url}}/oauth/token",
+              "host": ["{{orange_base_url}}"],
+              "path": ["oauth", "token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_ACCESS_TOKEN_HERE"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant\": {\n    \"country\": \"CI\",\n    \"name\": \"Afrikpay Gateway\"\n  },\n  \"order\": {\n    \"amount\": 100,\n    \"currency\": \"XOF\",\n    \"id\": \"test-{{$timestamp}}\",\n    \"reference\": \"Crypto purchase payment\"\n  },\n  \"customer\": {\n    \"msisdn\": \"+22507000000\",\n    \"country\": \"CI\"\n  },\n  \"notif_url\": \"https://webhook.site/test\",\n  \"return_url\": \"https://your-app.com/return\",\n  \"cancel_url\": \"https://your-app.com/cancel\"\n}"
+            },
+            "url": {
+              "raw": "{{orange_base_url}}/webpayment",
+              "host": ["{{orange_base_url}}"],
+              "path": ["webpayment"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_ACCESS_TOKEN_HERE"
+              }
+            ],
+            "url": {
+              "raw": "{{orange_base_url}}/webpayment/test-transaction-id",
+              "host": ["{{orange_base_url}}"],
+              "path": ["webpayment", "test-transaction-id"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🗄️ CRUD Service Tests",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{crud_base_url}}/health",
+              "host": ["{{crud_base_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Wallet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{crud_base_url}}/api/v1/wallets/user/test-user-id?currency=USDT",
+              "host": ["{{crud_base_url}}"],
+              "path": ["api", "v1", "wallets", "user", "test-user-id"],
+              "query": [
+                {
+                  "key": "currency",
+                  "value": "USDT"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"test-user-id\",\n  \"currency\": \"USDT\",\n  \"amount\": 100.50,\n  \"type\": \"PURCHASE\",\n  \"status\": \"PENDING\",\n  \"reference\": \"test-tx-{{$timestamp}}\",\n  \"description\": \"Test crypto purchase transaction\"\n}"
+            },
+            "url": {
+              "raw": "{{crud_base_url}}/api/v1/transactions",
+              "host": ["{{crud_base_url}}"],
+              "path": ["api", "v1", "transactions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Wallet Balance",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"test-user-id\",\n  \"currency\": \"USDT\",\n  \"amount\": 50.25,\n  \"operation\": \"ADD\"\n}"
+            },
+            "url": {
+              "raw": "{{crud_base_url}}/api/v1/wallets/balance",
+              "host": ["{{crud_base_url}}"],
+              "path": ["api", "v1", "wallets", "balance"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Generate timestamp for requests",
+          "pm.globals.set('timestamp', Math.floor(Date.now() / 1000));",
+          "",
+          "// Add common headers if needed",
+          "pm.request.headers.add({",
+          "    key: 'User-Agent',",
+          "    value: 'Afrikpay-Gateway/1.0'",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Common response tests",
+          "pm.test('Response time is less than 5000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('Response has valid JSON or proper error', function () {",
+          "    try {",
+          "        pm.response.json();",
+          "        pm.test('Response is valid JSON', function () {",
+          "            pm.expect(true).to.be.true;",
+          "        });",
+          "    } catch (e) {",
+          "        // For non-JSON responses, just check status",
+          "        pm.test('Response status is documented', function () {",
+          "            pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 401, 403, 404, 500]);",
+          "        });",
+          "    }",
+          "});"
+        ]
+      }
+    }
+  ]
+}
