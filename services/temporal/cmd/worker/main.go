@@ -17,7 +17,7 @@ func main() {
 
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-		configPath = "../config/config.yaml"
+		configPath = "config/config.yaml"
 	}
 
 	cfg, err := config.LoadConfig(configPath)
@@ -25,13 +25,12 @@ func main() {
 		log.Fatalf("unable to load config: %v", err)
 	}
 
-	// Set global config for workflows/activities
-	workflows.SetConfig(cfg)
 	// Set activity client factories
 	activities.SetConfigAwareFactories(cfg)
 
+	// Créer le client Temporal
 	c, err := client.Dial(client.Options{
-		HostPort: cfg.Temporal.Address,
+		HostPort: cfg.Temporal.Server.Address,
 	})
 	if err != nil {
 		log.Fatalf("unable to create Temporal client: %v", err)
@@ -40,11 +39,12 @@ func main() {
 
 	w := worker.New(c, "afrikpay", worker.Options{})
 
-	// Register workflows (pass cfg if needed)
-	//w.RegisterWorkflow(workflows.CreateUserWorkflow)
+	// Register workflows
+	w.RegisterWorkflow(workflows.BinancePriceWorkflow)
 
-	// Register activities as closures that inject cfg
-	//w.RegisterActivity(activities.CreateUserActivity)
+	// Register activities using singleton factories
+	binanceActivities := activities.GetBinanceActivitiesFromFactory()
+	w.RegisterActivity(binanceActivities.GetPrice)
 
 	log.Println("[Temporal] Worker started on task queue: afrikpay")
 	err = w.Run(worker.InterruptCh())

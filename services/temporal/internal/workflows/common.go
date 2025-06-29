@@ -8,17 +8,19 @@ import (
 	"go.temporal.io/sdk/workflow"
 )
 
-var configInstance *config.Config
+// Global configuration for workflows
+var globalConfig *config.Config
 
+// SetConfig sets the global configuration for workflows
 func SetConfig(cfg *config.Config) {
-	configInstance = cfg
+	globalConfig = cfg
 }
 
+// GetConfig returns the global configuration
 func GetConfig() *config.Config {
-	return configInstance
+	return globalConfig
 }
 
-// options d'activité par défaut
 func defaultActivityOptions() workflow.ActivityOptions {
 	// TODO: Ajouter des options d'activité par défaut depuis les fichier de configuration
 	retryPolicy := &temporal.RetryPolicy{
@@ -34,5 +36,3 @@ func defaultActivityOptions() workflow.ActivityOptions {
 		RetryPolicy:            retryPolicy,
 	}
 }
-
-// WorkflowHandler gère les requêtes de workflow

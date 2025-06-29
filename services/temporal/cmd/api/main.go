@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -18,13 +19,16 @@ func main() {
 	if configPath == "" {
 		configPath = "config/config.yaml"
 	}
-	cfg := config.MustLoadConfig(configPath)
+	cfg, err := config.LoadConfig(configPath)
+	if err != nil {
+		log.Fatalf("unable to load config: %v", err)
+	}
 
 	e := echo.New()
 
 	// Initialisation du client Temporal (production)
 	c, err := goTemporalClient.Dial(goTemporalClient.Options{
-		HostPort: cfg.Temporal.Address,
+		HostPort: cfg.Temporal.Server.Address,
 	})
 	if err != nil {
 		log.Fatalf("unable to create Temporal client: %v", err)
@@ -35,5 +39,7 @@ func main() {
 
 	handler.RegisterRoutes(e, cfg)
 
-	e.Logger.Fatal(e.Start(":" + cfg.Server.Port))
+	port := fmt.Sprintf(":%d", cfg.Temporal.API.Port)
+	log.Printf("Starting server on port %s (PortAPI value: %d)", port, cfg.Temporal.API.Port)
+	e.Logger.Fatal(e.Start(port))
 }

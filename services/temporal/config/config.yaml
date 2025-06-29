@@ -40,6 +40,11 @@ crud:
 # CIRCUIT BREAKER & RETRY POLICY
 # ================================
 temporal:
+  server:
+    address: "localhost:7233"
+  api:
+    address: "localhost"
+    port: 8088
   circuit_breaker:
     max_requests: 3
     interval: "60s"
@@ -52,11 +57,3 @@ temporal:
     max_delay: "30s"
     multiplier: 2.0
     jitter: true
-
-
-curl -X POST \
--H "Authorization: Basic TE5BemdWMndxY284cHdieDhpS1BiQU01QzJxeUF6SEI6TlRPSVFmbU4yMkFQd05jb0NQQktCYmV4c0hwT0l3eFR4VkRhWll1N3NtT2Y=" \
--H "Content-Type: application/x-www-form-urlencoded" \
--H "Accept: application/json" \
--d "grant_type=client_credentials" \
-https://api.orange.com/oauth/v3/token

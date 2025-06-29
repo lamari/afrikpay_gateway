@@ -1,0 +1,80 @@
+# Temporal Server Dynamic Configuration for Development with SQL Backend
+# This file contains runtime configuration settings for the Temporal Server
+
+# Frontend service configuration
+frontend.keepAliveConfig.serverTimeout:
+  - value: "30s"
+
+# History service configuration
+history.keepAliveConfig.serverTimeout:
+  - value: "30s"
+
+# Matching service configuration
+matching.keepAliveConfig.serverTimeout:
+  - value: "30s"
+
+# Worker service configuration
+worker.keepAliveConfig.serverTimeout:  
+  - value: "30s"
+
+# Database configuration
+limit.maxIDLength:
+  - value: 1000
+
+# Workflow execution limits
+limit.workflowExecutionTimeoutLimit:
+  - value: "24h"
+
+# Task queue limits
+matching.numTaskqueueWritePartitions:
+  - value: 4
+
+matching.numTaskqueueReadPartitions:
+  - value: 4
+
+# Enable development mode features
+system.enableActivityLocalDispatchByDomain:
+  - value: false
+
+# Persistence settings
+system.forceSearchAttributesCacheRefreshOnRead:
+  - value: false
+
+# Archival configuration (disabled for development)
+system.enableArchival:
+  - value: false
+
+# Advanced visibility configuration
+system.advancedVisibilityWritingMode:
+  - value: "on"
+
+# Search attributes configuration  
+searchattribute.cacheRefreshInterval:
+  - value: "10s"
+
+# Development-specific settings
+worker.enableLoggingInReplication:
+  - value: true
+
+# Task processing configuration
+matching.longPollExpirationInterval:
+  - value: "60s"
+
+# Frontend rate limiting (disabled for development)
+frontend.globalNamespaceRPS:
+  - value: 0
+
+# History service configuration
+history.defaultActivityRetryPolicy:
+  - value:
+      maximumAttempts: 3
+      initialInterval: "1s"
+      maximumInterval: "100s"
+      backoffCoefficient: 2.0
+
+# Resource limits for development
+system.blobSizeLimitError:
+  - value: 2097152  # 2MB
+
+system.blobSizeLimitWarn:
+  - value: 524288   # 512KB

@@ -20,6 +20,7 @@ type Config struct {
 	Resilience ResilienceConfig     `yaml:"resilience"`
 	CRUD       CrudConfig           `yaml:"crud"`
 	Logging    LoggingConfig        `yaml:"logging"`
+	Temporal   TemporalConfig       `yaml:"temporal"`
 }
 
 // ServerConfig holds server configuration
@@ -28,6 +29,19 @@ type ServerConfig struct {
 	ReadTimeout  time.Duration `yaml:"read_timeout"`
 	WriteTimeout time.Duration `yaml:"write_timeout"`
 	IdleTimeout  time.Duration `yaml:"idle_timeout"`
+}
+
+// TemporalConfig holds Temporal configuration
+type TemporalConfig struct {
+	Server struct {
+		Address string `yaml:"address"`
+	} `yaml:"server"`
+	API struct {
+		Address string `yaml:"address"`
+		Port    int    `yaml:"port"`
+	} `yaml:"api"`
+	CircuitBreaker CircuitBreakerConfig `yaml:"circuit_breaker"`
+	Retry          RetryConfig          `yaml:"retry_policy"`
 }
 
 // ResilienceConfig holds resilience pattern configurations

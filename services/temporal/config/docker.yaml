@@ -1,0 +1,90 @@
+# Temporal Server Configuration Template
+# This is a basic configuration template for Temporal server
+
+log:
+  stdout: true
+  level: info
+
+persistence:
+  defaultStore: default
+  visibilityStore: visibility
+  numHistoryShards: 1
+  datastores:
+    default:
+      driver: postgres12
+      host: postgresql
+      port: 5432
+      database: temporal
+      user: temporal
+      password: temporal
+      maxConns: 20
+      maxConnLifetime: "1h"
+    visibility:
+      driver: postgres12
+      host: postgresql
+      port: 5432
+      database: temporal_visibility  
+      user: temporal
+      password: temporal
+      maxConns: 20
+      maxConnLifetime: "1h"
+
+global:
+  membership:
+    maxJoinDuration: 30s
+    broadcastAddress: 0.0.0.0
+  pprof:
+    port: 7936
+
+services:
+  frontend:
+    rpc:
+      grpcPort: 7233
+      membershipPort: 6933
+      bindOnIP: 0.0.0.0
+
+  matching:
+    rpc:
+      grpcPort: 7235
+      membershipPort: 6935
+      bindOnIP: 0.0.0.0
+
+  history:
+    rpc:
+      grpcPort: 7234
+      membershipPort: 6934
+      bindOnIP: 0.0.0.0
+
+  worker:
+    rpc:
+      grpcPort: 7236
+      membershipPort: 6936
+      bindOnIP: 0.0.0.0
+
+clusterMetadata:
+  enableGlobalNamespace: false
+  failoverVersionIncrement: 10
+  masterClusterName: "active"
+  currentClusterName: "active"
+  clusterInformation:
+    active:
+      enabled: true
+      initialFailoverVersion: 1
+      rpcAddress: temporal:7233
+
+dcRedirectionPolicy:
+  policy: "noop"
+  toDC: ""
+
+archival:
+  history:
+    state: "disabled"
+  visibility:
+    state: "disabled"
+
+publicClient:
+  hostPort: temporal:7233
+
+dynamicConfigClient:
+  filepath: /etc/temporal/config/dynamicconfig
+  pollInterval: "10s"
