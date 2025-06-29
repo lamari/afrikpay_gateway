@@ -1,0 +1,2151 @@
+{
+  "collection": {
+    "item": [
+      {
+        "id": "68112da3-b1ce-4d6e-b4fd-158217bce5ce",
+        "name": "Binance API Tests",
+        "item": [
+          {
+            "id": "68cd2b76-1e9c-4ed2-87f5-dd35e9806b17",
+            "name": "Get Price - BTCUSDT",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "v3",
+                  "ticker",
+                  "price"
+                ],
+                "host": [
+                  "{{binance_base_url}}"
+                ],
+                "query": [
+                  {
+                    "key": "symbol",
+                    "value": "BTCUSDT"
+                  }
+                ],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "X-MBX-APIKEY",
+                  "value": "{{binance_api_key}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "28833def-8737-4f2a-bed6-4d0dfcd120b2",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has symbol and price', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('symbol');",
+                    "    pm.expect(jsonData).to.have.property('price');",
+                    "    pm.expect(jsonData.symbol).to.eql('BTCUSDT');",
+                    "    pm.expect(parseFloat(jsonData.price)).to.be.a('number');",
+                    "});",
+                    "",
+                    "pm.test('Price format matches our client expectation', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client expects price as string that can be parsed to float",
+                    "    pm.expect(jsonData.price).to.be.a('string');",
+                    "    pm.expect(parseFloat(jsonData.price)).to.be.above(0);",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "b18414a9-8686-49ff-8688-6621b0f98347",
+            "name": "Get Price - ETHUSDT",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "v3",
+                  "ticker",
+                  "price"
+                ],
+                "host": [
+                  "{{binance_base_url}}"
+                ],
+                "query": [
+                  {
+                    "key": "symbol",
+                    "value": "ETHUSDT"
+                  }
+                ],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "X-MBX-APIKEY",
+                  "value": "{{binance_api_key}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "1df4791e-f843-4f8f-8dfa-e83d45662904",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has symbol and price', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('symbol');",
+                    "    pm.expect(jsonData).to.have.property('price');",
+                    "    pm.expect(jsonData.symbol).to.eql('ETHUSDT');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "e457e23c-7411-44e9-b298-90863055328f",
+            "name": "Get All Prices (24hr Ticker)",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "v3",
+                  "ticker",
+                  "24hr"
+                ],
+                "host": [
+                  "{{binance_base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "X-MBX-APIKEY",
+                  "value": "{{binance_api_key}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "c8744593-3f72-4340-ad05-1535201cd9bc",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response is array of tickers', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.be.an('array');",
+                    "    pm.expect(jsonData.length).to.be.above(0);",
+                    "});",
+                    "",
+                    "pm.test('Each ticker has required fields', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    const firstTicker = jsonData[0];",
+                    "    pm.expect(firstTicker).to.have.property('symbol');",
+                    "    pm.expect(firstTicker).to.have.property('lastPrice');",
+                    "    pm.expect(firstTicker).to.have.property('volume');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "93d4603e-ebd4-4cc6-bb83-b05a8606426f",
+        "name": "Bitget API Tests",
+        "item": [
+          {
+            "id": "15135aad-bde2-4f24-96fb-fcd5c53a698d",
+            "name": "Get Ticker - BTCUSDT",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "spot",
+                  "v1",
+                  "market",
+                  "ticker"
+                ],
+                "host": [
+                  "{{bitget_base_url}}"
+                ],
+                "query": [
+                  {
+                    "key": "symbol",
+                    "value": "BTCUSDT"
+                  }
+                ],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "ACCESS-KEY",
+                  "value": "{{bitget_api_key}}"
+                },
+                {
+                  "key": "ACCESS-TIMESTAMP",
+                  "value": "{{$timestamp}}"
+                },
+                {
+                  "description": {
+                    "content": "This needs to be calculated based on Bitget's signature algorithm",
+                    "type": "text/plain"
+                  },
+                  "key": "ACCESS-SIGN",
+                  "value": "SIGNATURE_PLACEHOLDER"
+                },
+                {
+                  "key": "ACCESS-PASSPHRASE",
+                  "value": "{{bitget_passphrase}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "067ccd8a-7eae-4947-acdd-8f59d111e938",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has correct structure', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('code');",
+                    "    pm.expect(jsonData).to.have.property('msg');",
+                    "    pm.expect(jsonData).to.have.property('data');",
+                    "});",
+                    "",
+                    "pm.test('Data has required fields for our client', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    if (jsonData.code === '00000' && jsonData.data) {",
+                    "        pm.expect(jsonData.data).to.have.property('symbol');",
+                    "        pm.expect(jsonData.data).to.have.property('lastPr');",
+                    "        pm.expect(jsonData.data).to.have.property('baseVolume');",
+                    "    }",
+                    "});"
+                  ],
+                  "_lastExecutionId": "3385ce51-bea8-4b19-a9cf-d99908b73b9d"
+                }
+              }
+            ]
+          },
+          {
+            "id": "a3232ff3-0360-4b1f-81c7-bea85bbcd8ed",
+            "name": "Get All Tickers",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "spot",
+                  "v1",
+                  "market",
+                  "tickers"
+                ],
+                "host": [
+                  "{{bitget_base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "ACCESS-KEY",
+                  "value": "{{bitget_api_key}}"
+                },
+                {
+                  "key": "ACCESS-TIMESTAMP",
+                  "value": "{{$timestamp}}"
+                },
+                {
+                  "key": "ACCESS-SIGN",
+                  "value": "SIGNATURE_PLACEHOLDER"
+                },
+                {
+                  "key": "ACCESS-PASSPHRASE",
+                  "value": "{{bitget_passphrase}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "fcdf2196-ca29-4e90-84f2-0d60ab710f87",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has correct structure', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('code');",
+                    "    pm.expect(jsonData).to.have.property('data');",
+                    "});",
+                    "",
+                    "pm.test('Data is array of tickers', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    if (jsonData.code === '00000') {",
+                    "        pm.expect(jsonData.data).to.be.an('array');",
+                    "        if (jsonData.data.length > 0) {",
+                    "            const firstTicker = jsonData.data[0];",
+                    "            pm.expect(firstTicker).to.have.property('symbol');",
+                    "            pm.expect(firstTicker).to.have.property('lastPr');",
+                    "        }",
+                    "    }",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "6dca12c6-1662-4503-8027-9c6bc6681bd6",
+        "name": "MTN Mobile Money API Tests",
+        "item": [
+          {
+            "id": "438f7433-76bf-4a72-b799-c36270064071",
+            "name": "Get Account Balance",
+            "request": {
+              "url": {
+                "path": [
+                  "collection",
+                  "v1_0",
+                  "accountbalance"
+                ],
+                "host": [
+                  "{{mtn_sandbox_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{mtn_api_key}}"
+                },
+                {
+                  "key": "X-Target-Environment",
+                  "value": "sandbox"
+                },
+                {
+                  "key": "Ocp-Apim-Subscription-Key",
+                  "value": "{{mtn_subscription_key}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "f2666529-5fed-41f5-a953-c37e7df55da9",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has balance information', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('availableBalance');",
+                    "    pm.expect(jsonData).to.have.property('currency');",
+                    "});",
+                    "",
+                    "pm.test('Balance format matches our client expectation', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client expects availableBalance as string",
+                    "    pm.expect(jsonData.availableBalance).to.be.a('string');",
+                    "    pm.expect(parseFloat(jsonData.availableBalance)).to.be.a('number');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "92c8f846-606d-44bb-9caa-ed6472f13499",
+            "name": "Request to Pay",
+            "request": {
+              "url": {
+                "path": [
+                  "collection",
+                  "v1_0",
+                  "requesttopay"
+                ],
+                "host": [
+                  "{{mtn_sandbox_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{mtn_api_key}}"
+                },
+                {
+                  "key": "X-Reference-Id",
+                  "value": "{{$guid}}"
+                },
+                {
+                  "key": "X-Target-Environment",
+                  "value": "sandbox"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Ocp-Apim-Subscription-Key",
+                  "value": "{{mtn_subscription_key}}"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"amount\": \"100.00\",\n    \"currency\": \"EUR\",\n    \"externalId\": \"test-{{$timestamp}}\",\n    \"payer\": {\n        \"partyIdType\": \"MSISDN\",\n        \"partyId\": \"256774290781\"\n    },\n    \"payerMessage\": \"Test payment from Afrikpay\",\n    \"payeeNote\": \"Payment for crypto purchase\"\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "f258aa82-38a5-4d17-8fc0-0f457a898abb",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 202 (Accepted)', function () {",
+                    "    pm.response.to.have.status(202);",
+                    "});",
+                    "",
+                    "pm.test('Response has X-Reference-Id header', function () {",
+                    "    pm.expect(pm.response.headers.get('X-Reference-Id')).to.not.be.null;",
+                    "    // Store reference ID for status check",
+                    "    pm.globals.set('mtn_reference_id', pm.response.headers.get('X-Reference-Id'));",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "258e0ed0-0179-48d1-9d76-e23bf9971cef",
+            "name": "Get Payment Status",
+            "request": {
+              "url": {
+                "path": [
+                  "collection",
+                  "v1_0",
+                  "requesttopay",
+                  "{{mtn_reference_id}}"
+                ],
+                "host": [
+                  "{{mtn_sandbox_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{mtn_api_key}}"
+                },
+                {
+                  "key": "X-Target-Environment",
+                  "value": "sandbox"
+                },
+                {
+                  "key": "Ocp-Apim-Subscription-Key",
+                  "value": "{{mtn_subscription_key}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "5fd8ba85-878c-4832-b6a8-104a96b01549",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has payment status fields', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('amount');",
+                    "    pm.expect(jsonData).to.have.property('currency');",
+                    "    pm.expect(jsonData).to.have.property('status');",
+                    "});",
+                    "",
+                    "pm.test('Status field matches our client expectations', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client maps MTN statuses to our internal statuses",
+                    "    const validStatuses = ['PENDING', 'SUCCESSFUL', 'FAILED'];",
+                    "    pm.expect(validStatuses).to.include(jsonData.status);",
+                    "});",
+                    "",
+                    "pm.test('Amount format matches our client expectation', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client expects amount as string",
+                    "    pm.expect(jsonData.amount).to.be.a('string');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "731cbde4-1fec-4e98-879e-5ab9212ca4f9",
+        "name": "Orange Money API Tests",
+        "item": [
+          {
+            "id": "031a0092-57ab-47b9-a3f1-796478ba2e5f",
+            "name": "Get Account Balance",
+            "request": {
+              "url": {
+                "path": [
+                  "omcoreapis",
+                  "1.0.2",
+                  "mp",
+                  "balance"
+                ],
+                "host": [
+                  "{{orange_sandbox_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{orange_api_key}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "659b097e-1791-4b85-929b-cbebbaf998a7",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has balance information', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('balance');",
+                    "    pm.expect(jsonData).to.have.property('currency');",
+                    "});",
+                    "",
+                    "pm.test('Balance format matches our client expectation', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client expects balance as number (float64)",
+                    "    pm.expect(jsonData.balance).to.be.a('number');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "71e51f0e-4b1d-43ce-a389-8754a6a4bbc9",
+            "name": "Initiate Payment",
+            "request": {
+              "url": {
+                "path": [
+                  "omcoreapis",
+                  "1.0.2",
+                  "mp",
+                  "pay"
+                ],
+                "host": [
+                  "{{orange_sandbox_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{orange_api_key}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"amount\": 100.00,\n    \"currency\": \"XOF\",\n    \"phoneNumber\": \"+22507000000\",\n    \"description\": \"Test payment from Afrikpay\",\n    \"externalId\": \"test-{{$timestamp}}\"\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "2dbbd79f-4b53-40f4-b96e-6ef3cf638877",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 201 (Created)', function () {",
+                    "    pm.response.to.have.status(201);",
+                    "});",
+                    "",
+                    "pm.test('Response has transaction information', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('transactionId');",
+                    "    pm.expect(jsonData).to.have.property('status');",
+                    "    // Store transaction ID for status check",
+                    "    pm.globals.set('orange_transaction_id', jsonData.transactionId);",
+                    "});",
+                    "",
+                    "pm.test('Transaction ID format matches our client expectation', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client expects transactionId as string",
+                    "    pm.expect(jsonData.transactionId).to.be.a('string');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "bf07f083-3c6e-44a7-8cae-31a88c783b04",
+            "name": "Get Payment Status",
+            "request": {
+              "url": {
+                "path": [
+                  "omcoreapis",
+                  "1.0.2",
+                  "mp",
+                  "status",
+                  "{{orange_transaction_id}}"
+                ],
+                "host": [
+                  "{{orange_sandbox_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{orange_api_key}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "8963db97-16df-417e-88cd-b50d6d352eb9",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response has payment status fields', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('transactionId');",
+                    "    pm.expect(jsonData).to.have.property('status');",
+                    "    pm.expect(jsonData).to.have.property('amount');",
+                    "});",
+                    "",
+                    "pm.test('Status field matches our client expectations', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client maps Orange statuses to our internal statuses",
+                    "    const validStatuses = ['PENDING', 'SUCCESS', 'FAILED'];",
+                    "    pm.expect(validStatuses).to.include(jsonData.status);",
+                    "});",
+                    "",
+                    "pm.test('Amount format matches our client expectation', function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    // Our client expects amount as number (float64)",
+                    "    pm.expect(jsonData.amount).to.be.a('number');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "auth": {
+      "type": "noauth",
+      "noauth": []
+    },
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "id": "dbd4fc40-4472-4a2a-ae23-73d4039c6f44",
+          "type": "text/javascript",
+          "exec": [
+            "// Global pre-request script for common setup",
+            "console.log('Running pre-request script for:', pm.info.requestName);"
+          ],
+          "_lastExecutionId": "03941db8-4438-452a-ad7d-2b3836f9d321"
+        }
+      },
+      {
+        "listen": "test",
+        "script": {
+          "id": "e4d25ce5-a5f3-4109-ad89-ae24692db959",
+          "type": "text/javascript",
+          "exec": [
+            "// Global test script for common validations",
+            "pm.test('Response time is acceptable', function () {",
+            "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+            "});",
+            "",
+            "pm.test('Response has valid JSON format', function () {",
+            "    pm.response.to.be.json;",
+            "});"
+          ],
+          "_lastExecutionId": "96c0a31b-9594-47b9-b86d-a93489572434"
+        }
+      }
+    ],
+    "variable": [
+      {
+        "type": "string",
+        "value": "https://api.binance.com",
+        "key": "binance_base_url"
+      },
+      {
+        "type": "string",
+        "value": "https://testnet.binance.vision",
+        "key": "binance_testnet_url"
+      },
+      {
+        "type": "string",
+        "value": "https://api.bitget.com",
+        "key": "bitget_base_url"
+      },
+      {
+        "type": "string",
+        "value": "https://sandbox.momodeveloper.mtn.com",
+        "key": "mtn_sandbox_url"
+      },
+      {
+        "type": "string",
+        "value": "https://api.orange.com",
+        "key": "orange_sandbox_url"
+      },
+      {
+        "type": "string",
+        "value": "YOUR_BINANCE_API_KEY",
+        "key": "binance_api_key"
+      },
+      {
+        "type": "string",
+        "value": "YOUR_BITGET_API_KEY",
+        "key": "bitget_api_key"
+      },
+      {
+        "type": "string",
+        "value": "YOUR_BITGET_SECRET_KEY",
+        "key": "bitget_secret_key"
+      },
+      {
+        "type": "string",
+        "value": "YOUR_BITGET_PASSPHRASE",
+        "key": "bitget_passphrase"
+      },
+      {
+        "type": "string",
+        "value": "YOUR_MTN_API_KEY",
+        "key": "mtn_api_key"
+      },
+      {
+        "type": "string",
+        "value": "YOUR_MTN_SUBSCRIPTION_KEY",
+        "key": "mtn_subscription_key"
+      },
+      {
+        "type": "string",
+        "value": "YOUR_ORANGE_API_KEY",
+        "key": "orange_api_key"
+      }
+    ],
+    "info": {
+      "_postman_id": "33cf2a0e-9b78-46b9-99e6-2cfbcc379e65",
+      "name": "Afrikpay Third Party APIs Validation",
+      "version": {
+        "raw": "1.0.0",
+        "major": 1,
+        "minor": 0,
+        "patch": 0,
+        "prerelease": [],
+        "build": [],
+        "string": "1.0.0"
+      },
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Collection to test direct API calls to Binance, Bitget, MTN, and Orange APIs to validate our client implementations",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment"
+    },
+    "id": "third-party-apis-env",
+    "name": "Third Party APIs Environment",
+    "values": [
+      {
+        "type": "any",
+        "value": "https://testnet.binance.vision",
+        "key": "binance_base_url"
+      },
+      {
+        "type": "any",
+        "value": "https://testnet.binance.vision",
+        "key": "binance_testnet_url"
+      },
+      {
+        "type": "any",
+        "value": "https://api.bitget.com",
+        "key": "bitget_base_url"
+      },
+      {
+        "type": "any",
+        "value": "https://sandbox.momodeveloper.mtn.com",
+        "key": "mtn_sandbox_url"
+      },
+      {
+        "type": "any",
+        "value": "https://api.orange.com",
+        "key": "orange_sandbox_url"
+      },
+      {
+        "type": "any",
+        "value": "demo_binance_key_for_testing",
+        "key": "binance_api_key"
+      },
+      {
+        "type": "any",
+        "value": "demo_bitget_key",
+        "key": "bitget_api_key"
+      },
+      {
+        "type": "any",
+        "value": "demo_bitget_secret",
+        "key": "bitget_secret_key"
+      },
+      {
+        "type": "any",
+        "value": "demo_passphrase",
+        "key": "bitget_passphrase"
+      },
+      {
+        "type": "any",
+        "value": "demo_mtn_api_key",
+        "key": "mtn_api_key"
+      },
+      {
+        "type": "any",
+        "value": "demo_mtn_subscription_key",
+        "key": "mtn_subscription_key"
+      },
+      {
+        "type": "any",
+        "value": "demo_orange_api_key",
+        "key": "orange_api_key"
+      }
+    ]
+  },
+  "globals": {
+    "id": "ad7c9c76-082c-4c53-9f9c-b2577fa75e36",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 3,
+        "pending": 0,
+        "failed": 1
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 5,
+        "pending": 0,
+        "failed": 1
+      },
+      "testScripts": {
+        "total": 2,
+        "pending": 0,
+        "failed": 1
+      },
+      "prerequestScripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 995,
+      "responseMin": 995,
+      "responseMax": 995,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1751067993035,
+      "completed": 1751067995078
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 2,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "1ee71424-7e09-4fa6-956b-536e34c838f4",
+          "httpRequestId": "0dbfd316-77c8-4739-8346-4cfce1fdc03f"
+        },
+        "item": {
+          "id": "15135aad-bde2-4f24-96fb-fcd5c53a698d",
+          "name": "Get Ticker - BTCUSDT",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "spot",
+                "v1",
+                "market",
+                "ticker"
+              ],
+              "host": [
+                "{{bitget_base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "ACCESS-KEY",
+                "value": "{{bitget_api_key}}"
+              },
+              {
+                "key": "ACCESS-TIMESTAMP",
+                "value": "{{$timestamp}}"
+              },
+              {
+                "description": {
+                  "content": "This needs to be calculated based on Bitget's signature algorithm",
+                  "type": "text/plain"
+                },
+                "key": "ACCESS-SIGN",
+                "value": "SIGNATURE_PLACEHOLDER"
+              },
+              {
+                "key": "ACCESS-PASSPHRASE",
+                "value": "{{bitget_passphrase}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "067ccd8a-7eae-4947-acdd-8f59d111e938",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('code');",
+                  "    pm.expect(jsonData).to.have.property('msg');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('Data has required fields for our client', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.code === '00000' && jsonData.data) {",
+                  "        pm.expect(jsonData.data).to.have.property('symbol');",
+                  "        pm.expect(jsonData.data).to.have.property('lastPr');",
+                  "        pm.expect(jsonData.data).to.have.property('baseVolume');",
+                  "    }",
+                  "});"
+                ],
+                "_lastExecutionId": "3385ce51-bea8-4b19-a9cf-d99908b73b9d"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "spot",
+              "v1",
+              "market",
+              "ticker"
+            ],
+            "host": [
+              "api",
+              "bitget",
+              "com"
+            ],
+            "query": [
+              {
+                "key": "symbol",
+                "value": "BTCUSDT"
+              }
+            ],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "ACCESS-KEY",
+              "value": "demo_bitget_key"
+            },
+            {
+              "key": "ACCESS-TIMESTAMP",
+              "value": "1751067994"
+            },
+            {
+              "description": {
+                "content": "This needs to be calculated based on Bitget's signature algorithm",
+                "type": "text/plain"
+              },
+              "key": "ACCESS-SIGN",
+              "value": "SIGNATURE_PLACEHOLDER"
+            },
+            {
+              "key": "ACCESS-PASSPHRASE",
+              "value": "demo_passphrase"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.37.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "30188c9a-83e3-4b41-bcd0-e36058c9b72a",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "api.bitget.com",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET",
+          "auth": {
+            "type": "noauth",
+            "noauth": []
+          }
+        },
+        "response": {
+          "id": "b10346a7-678b-47b1-995c-028a9a60b6f7",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Fri, 27 Jun 2025 23:46:35 GMT"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Length",
+              "value": "97"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "x-mbx-used-remain-limit",
+              "value": "19"
+            },
+            {
+              "key": "access-control-allow-origin",
+              "value": "*"
+            },
+            {
+              "key": "access-control-allow-methods",
+              "value": "GET, POST, OPTIONS"
+            },
+            {
+              "key": "cf-cache-status",
+              "value": "DYNAMIC"
+            },
+            {
+              "key": "Set-Cookie",
+              "value": "__cf_bm=xz1dJl5LDzC7mkD9cKzje4i7fl8syQogCyr6IZfty0c-1751067995-1.0.1.1-bLUg165Qb8k4i6M51oBW9NV1zBTuDkV8k.RP2qqkAtCjAUPywkaKUjOMZ00in5QObwnmahT1VxBa6S65e3jZ3UsKMI2qWMZvfkdmLDYCrFQ; path=/; expires=Sat, 28-Jun-25 00:16:35 GMT; domain=.api.bitget.com; HttpOnly; Secure; SameSite=None"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "key": "Server",
+              "value": "cloudflare"
+            },
+            {
+              "key": "CF-RAY",
+              "value": "9568d314e897e1e5-MRS"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              99,
+              111,
+              100,
+              101,
+              34,
+              58,
+              34,
+              52,
+              48,
+              48,
+              51,
+              52,
+              34,
+              44,
+              34,
+              109,
+              115,
+              103,
+              34,
+              58,
+              34,
+              80,
+              97,
+              114,
+              97,
+              109,
+              101,
+              116,
+              101,
+              114,
+              32,
+              66,
+              84,
+              67,
+              85,
+              83,
+              68,
+              84,
+              32,
+              100,
+              111,
+              101,
+              115,
+              32,
+              110,
+              111,
+              116,
+              32,
+              101,
+              120,
+              105,
+              115,
+              116,
+              34,
+              44,
+              34,
+              114,
+              101,
+              113,
+              117,
+              101,
+              115,
+              116,
+              84,
+              105,
+              109,
+              101,
+              34,
+              58,
+              49,
+              55,
+              53,
+              49,
+              48,
+              54,
+              55,
+              57,
+              57,
+              52,
+              57,
+              51,
+              48,
+              44,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              110,
+              117,
+              108,
+              108,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 995,
+          "responseSize": 97
+        },
+        "id": "15135aad-bde2-4f24-96fb-fcd5c53a698d",
+        "assertions": [
+          {
+            "assertion": "Response time is acceptable",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has valid JSON format",
+            "skipped": false
+          },
+          {
+            "assertion": "Status code is 200",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code is 200",
+              "message": "expected response to have status code 200 but got 400",
+              "stack": "AssertionError: expected response to have status code 200 but got 400\n   at Object.eval sandbox-script.js:1:1)"
+            }
+          },
+          {
+            "assertion": "Response has correct structure",
+            "skipped": false
+          },
+          {
+            "assertion": "Data has required fields for our client",
+            "skipped": false
+          }
+        ],
+        "testScript": [
+          {
+            "error": {
+              "name": "AssertionFailure",
+              "message": "Status code is 200",
+              "stack": "AssertionFailure: Status code is 200\n    at postProcessContext (/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js:41:17)\n    at PostmanCollectionRun.<anonymous> (/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js:513:39)\n    at PostmanSandbox.<anonymous> (/opt/homebrew/lib/node_modules/newman/node_modules/postman-sandbox/lib/postman-sandbox.js:122:13)\n    at Object.onceWrapper (node:events:622:26)\n    at PostmanSandbox.emit (node:events:507:28)\n    at context.__uvm_emit (/opt/homebrew/lib/node_modules/newman/node_modules/uvm/lib/bridge.js:71:21)\n    at Object.dispatch (evalmachine.<anonymous>:20:13)\n    at Object.<anonymous> (evalmachine.<anonymous>:66:7838)\n    at t.exports.terminate (evalmachine.<anonymous>:66:20792)\n    at Immediate._onImmediate (evalmachine.<anonymous>:66:5971)\n    at process.processImmediate (node:internal/timers:507:21)",
+              "checksum": "4e465d650d6e9a62fb9905a1e0b7b377",
+              "id": "6a406ea3-97e6-4ca4-9504-67a8cae1246e",
+              "timestamp": 1751067995075,
+              "stacktrace": [
+                {
+                  "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js",
+                  "lineNumber": 41,
+                  "functionName": "postProcessContext",
+                  "typeName": "Object",
+                  "methodName": null,
+                  "columnNumber": 17,
+                  "native": false
+                },
+                {
+                  "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js",
+                  "lineNumber": 513,
+                  "functionName": "",
+                  "typeName": "PostmanCollectionRun",
+                  "methodName": null,
+                  "columnNumber": 39,
+                  "native": false
+                },
+                {
+                  "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/postman-sandbox/lib/postman-sandbox.js",
+                  "lineNumber": 122,
+                  "functionName": "",
+                  "typeName": "PostmanSandbox",
+                  "methodName": null,
+                  "columnNumber": 13,
+                  "native": false
+                },
+                {
+                  "fileName": "node:events",
+                  "lineNumber": 622,
+                  "functionName": "Object.onceWrapper",
+                  "typeName": "Object",
+                  "methodName": "onceWrapper",
+                  "columnNumber": 26,
+                  "native": false
+                },
+                {
+                  "fileName": "node:events",
+                  "lineNumber": 507,
+                  "functionName": "PostmanSandbox.emit",
+                  "typeName": "PostmanSandbox",
+                  "methodName": "emit",
+                  "columnNumber": 28,
+                  "native": false
+                },
+                {
+                  "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/uvm/lib/bridge.js",
+                  "lineNumber": 71,
+                  "functionName": "context.__uvm_emit",
+                  "typeName": "context",
+                  "methodName": "__uvm_emit",
+                  "columnNumber": 21,
+                  "native": false
+                },
+                {
+                  "fileName": "evalmachine.<anonymous>",
+                  "lineNumber": 20,
+                  "functionName": "Object.dispatch",
+                  "typeName": "Object",
+                  "methodName": "dispatch",
+                  "columnNumber": 13,
+                  "native": false
+                },
+                {
+                  "fileName": "evalmachine.<anonymous>",
+                  "lineNumber": 66,
+                  "functionName": "",
+                  "typeName": "Object",
+                  "methodName": null,
+                  "columnNumber": 7838,
+                  "native": false
+                },
+                {
+                  "fileName": "evalmachine.<anonymous>",
+                  "lineNumber": 66,
+                  "functionName": "t.exports.terminate",
+                  "typeName": "t",
+                  "methodName": "exports.terminate",
+                  "columnNumber": 20792,
+                  "native": false
+                },
+                {
+                  "fileName": "evalmachine.<anonymous>",
+                  "lineNumber": 66,
+                  "functionName": "Immediate._onImmediate",
+                  "typeName": "Immediate",
+                  "methodName": "_onImmediate",
+                  "columnNumber": 5971,
+                  "native": false
+                },
+                {
+                  "fileName": "node:internal/timers",
+                  "lineNumber": 507,
+                  "functionName": "process.processImmediate",
+                  "typeName": "process",
+                  "methodName": "processImmediate",
+                  "columnNumber": 21,
+                  "native": false
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 97
+    },
+    "failures": [
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code is 200",
+          "message": "expected response to have status code 200 but got 400",
+          "stack": "AssertionError: expected response to have status code 200 but got 400\n   at Object.eval sandbox-script.js:1:1)",
+          "checksum": "1b6d82fd325bf4b22cff01833651aec6",
+          "id": "190b1969-4001-4e65-a5b7-4f987bc74a04",
+          "timestamp": 1751067995073,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 1,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "15135aad-bde2-4f24-96fb-fcd5c53a698d",
+          "name": "Get Ticker - BTCUSDT",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "spot",
+                "v1",
+                "market",
+                "ticker"
+              ],
+              "host": [
+                "{{bitget_base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "ACCESS-KEY",
+                "value": "{{bitget_api_key}}"
+              },
+              {
+                "key": "ACCESS-TIMESTAMP",
+                "value": "{{$timestamp}}"
+              },
+              {
+                "description": {
+                  "content": "This needs to be calculated based on Bitget's signature algorithm",
+                  "type": "text/plain"
+                },
+                "key": "ACCESS-SIGN",
+                "value": "SIGNATURE_PLACEHOLDER"
+              },
+              {
+                "key": "ACCESS-PASSPHRASE",
+                "value": "{{bitget_passphrase}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "067ccd8a-7eae-4947-acdd-8f59d111e938",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('code');",
+                  "    pm.expect(jsonData).to.have.property('msg');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('Data has required fields for our client', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.code === '00000' && jsonData.data) {",
+                  "        pm.expect(jsonData.data).to.have.property('symbol');",
+                  "        pm.expect(jsonData.data).to.have.property('lastPr');",
+                  "        pm.expect(jsonData.data).to.have.property('baseVolume');",
+                  "    }",
+                  "});"
+                ],
+                "_lastExecutionId": "3385ce51-bea8-4b19-a9cf-d99908b73b9d"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "93d4603e-ebd4-4cc6-bb83-b05a8606426f",
+          "name": "Bitget API Tests",
+          "item": [
+            {
+              "id": "15135aad-bde2-4f24-96fb-fcd5c53a698d",
+              "name": "Get Ticker - BTCUSDT",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "spot",
+                    "v1",
+                    "market",
+                    "ticker"
+                  ],
+                  "host": [
+                    "{{bitget_base_url}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "symbol",
+                      "value": "BTCUSDT"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "ACCESS-KEY",
+                    "value": "{{bitget_api_key}}"
+                  },
+                  {
+                    "key": "ACCESS-TIMESTAMP",
+                    "value": "{{$timestamp}}"
+                  },
+                  {
+                    "description": {
+                      "content": "This needs to be calculated based on Bitget's signature algorithm",
+                      "type": "text/plain"
+                    },
+                    "key": "ACCESS-SIGN",
+                    "value": "SIGNATURE_PLACEHOLDER"
+                  },
+                  {
+                    "key": "ACCESS-PASSPHRASE",
+                    "value": "{{bitget_passphrase}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "067ccd8a-7eae-4947-acdd-8f59d111e938",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has correct structure', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('code');",
+                      "    pm.expect(jsonData).to.have.property('msg');",
+                      "    pm.expect(jsonData).to.have.property('data');",
+                      "});",
+                      "",
+                      "pm.test('Data has required fields for our client', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    if (jsonData.code === '00000' && jsonData.data) {",
+                      "        pm.expect(jsonData.data).to.have.property('symbol');",
+                      "        pm.expect(jsonData.data).to.have.property('lastPr');",
+                      "        pm.expect(jsonData.data).to.have.property('baseVolume');",
+                      "    }",
+                      "});"
+                    ],
+                    "_lastExecutionId": "3385ce51-bea8-4b19-a9cf-d99908b73b9d"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "a3232ff3-0360-4b1f-81c7-bea85bbcd8ed",
+              "name": "Get All Tickers",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "spot",
+                    "v1",
+                    "market",
+                    "tickers"
+                  ],
+                  "host": [
+                    "{{bitget_base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "ACCESS-KEY",
+                    "value": "{{bitget_api_key}}"
+                  },
+                  {
+                    "key": "ACCESS-TIMESTAMP",
+                    "value": "{{$timestamp}}"
+                  },
+                  {
+                    "key": "ACCESS-SIGN",
+                    "value": "SIGNATURE_PLACEHOLDER"
+                  },
+                  {
+                    "key": "ACCESS-PASSPHRASE",
+                    "value": "{{bitget_passphrase}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "fcdf2196-ca29-4e90-84f2-0d60ab710f87",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has correct structure', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('code');",
+                      "    pm.expect(jsonData).to.have.property('data');",
+                      "});",
+                      "",
+                      "pm.test('Data is array of tickers', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    if (jsonData.code === '00000') {",
+                      "        pm.expect(jsonData.data).to.be.an('array');",
+                      "        if (jsonData.data.length > 0) {",
+                      "            const firstTicker = jsonData.data[0];",
+                      "            pm.expect(firstTicker).to.have.property('symbol');",
+                      "            pm.expect(firstTicker).to.have.property('lastPr');",
+                      "        }",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 2,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "1ee71424-7e09-4fa6-956b-536e34c838f4",
+          "httpRequestId": "0dbfd316-77c8-4739-8346-4cfce1fdc03f",
+          "scriptId": "067ccd8a-7eae-4947-acdd-8f59d111e938",
+          "execution": "3385ce51-bea8-4b19-a9cf-d99908b73b9d"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionFailure",
+          "message": "Status code is 200",
+          "stack": "AssertionFailure: Status code is 200\n    at postProcessContext (/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js:41:17)\n    at PostmanCollectionRun.<anonymous> (/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js:513:39)\n    at PostmanSandbox.<anonymous> (/opt/homebrew/lib/node_modules/newman/node_modules/postman-sandbox/lib/postman-sandbox.js:122:13)\n    at Object.onceWrapper (node:events:622:26)\n    at PostmanSandbox.emit (node:events:507:28)\n    at context.__uvm_emit (/opt/homebrew/lib/node_modules/newman/node_modules/uvm/lib/bridge.js:71:21)\n    at Object.dispatch (evalmachine.<anonymous>:20:13)\n    at Object.<anonymous> (evalmachine.<anonymous>:66:7838)\n    at t.exports.terminate (evalmachine.<anonymous>:66:20792)\n    at Immediate._onImmediate (evalmachine.<anonymous>:66:5971)\n    at process.processImmediate (node:internal/timers:507:21)",
+          "checksum": "4e465d650d6e9a62fb9905a1e0b7b377",
+          "id": "6a406ea3-97e6-4ca4-9504-67a8cae1246e",
+          "timestamp": 1751067995075,
+          "stacktrace": [
+            {
+              "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js",
+              "lineNumber": 41,
+              "functionName": "postProcessContext",
+              "typeName": "Object",
+              "methodName": null,
+              "columnNumber": 17,
+              "native": false
+            },
+            {
+              "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/postman-runtime/lib/runner/extensions/event.command.js",
+              "lineNumber": 513,
+              "functionName": "",
+              "typeName": "PostmanCollectionRun",
+              "methodName": null,
+              "columnNumber": 39,
+              "native": false
+            },
+            {
+              "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/postman-sandbox/lib/postman-sandbox.js",
+              "lineNumber": 122,
+              "functionName": "",
+              "typeName": "PostmanSandbox",
+              "methodName": null,
+              "columnNumber": 13,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 622,
+              "functionName": "Object.onceWrapper",
+              "typeName": "Object",
+              "methodName": "onceWrapper",
+              "columnNumber": 26,
+              "native": false
+            },
+            {
+              "fileName": "node:events",
+              "lineNumber": 507,
+              "functionName": "PostmanSandbox.emit",
+              "typeName": "PostmanSandbox",
+              "methodName": "emit",
+              "columnNumber": 28,
+              "native": false
+            },
+            {
+              "fileName": "/opt/homebrew/lib/node_modules/newman/node_modules/uvm/lib/bridge.js",
+              "lineNumber": 71,
+              "functionName": "context.__uvm_emit",
+              "typeName": "context",
+              "methodName": "__uvm_emit",
+              "columnNumber": 21,
+              "native": false
+            },
+            {
+              "fileName": "evalmachine.<anonymous>",
+              "lineNumber": 20,
+              "functionName": "Object.dispatch",
+              "typeName": "Object",
+              "methodName": "dispatch",
+              "columnNumber": 13,
+              "native": false
+            },
+            {
+              "fileName": "evalmachine.<anonymous>",
+              "lineNumber": 66,
+              "functionName": "",
+              "typeName": "Object",
+              "methodName": null,
+              "columnNumber": 7838,
+              "native": false
+            },
+            {
+              "fileName": "evalmachine.<anonymous>",
+              "lineNumber": 66,
+              "functionName": "t.exports.terminate",
+              "typeName": "t",
+              "methodName": "exports.terminate",
+              "columnNumber": 20792,
+              "native": false
+            },
+            {
+              "fileName": "evalmachine.<anonymous>",
+              "lineNumber": 66,
+              "functionName": "Immediate._onImmediate",
+              "typeName": "Immediate",
+              "methodName": "_onImmediate",
+              "columnNumber": 5971,
+              "native": false
+            },
+            {
+              "fileName": "node:internal/timers",
+              "lineNumber": 507,
+              "functionName": "process.processImmediate",
+              "typeName": "process",
+              "methodName": "processImmediate",
+              "columnNumber": 21,
+              "native": false
+            }
+          ]
+        },
+        "at": "test-script:39:17",
+        "source": {
+          "id": "15135aad-bde2-4f24-96fb-fcd5c53a698d",
+          "name": "Get Ticker - BTCUSDT",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "spot",
+                "v1",
+                "market",
+                "ticker"
+              ],
+              "host": [
+                "{{bitget_base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "ACCESS-KEY",
+                "value": "{{bitget_api_key}}"
+              },
+              {
+                "key": "ACCESS-TIMESTAMP",
+                "value": "{{$timestamp}}"
+              },
+              {
+                "description": {
+                  "content": "This needs to be calculated based on Bitget's signature algorithm",
+                  "type": "text/plain"
+                },
+                "key": "ACCESS-SIGN",
+                "value": "SIGNATURE_PLACEHOLDER"
+              },
+              {
+                "key": "ACCESS-PASSPHRASE",
+                "value": "{{bitget_passphrase}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "067ccd8a-7eae-4947-acdd-8f59d111e938",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has correct structure', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('code');",
+                  "    pm.expect(jsonData).to.have.property('msg');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "});",
+                  "",
+                  "pm.test('Data has required fields for our client', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.code === '00000' && jsonData.data) {",
+                  "        pm.expect(jsonData.data).to.have.property('symbol');",
+                  "        pm.expect(jsonData.data).to.have.property('lastPr');",
+                  "        pm.expect(jsonData.data).to.have.property('baseVolume');",
+                  "    }",
+                  "});"
+                ],
+                "_lastExecutionId": "3385ce51-bea8-4b19-a9cf-d99908b73b9d"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "93d4603e-ebd4-4cc6-bb83-b05a8606426f",
+          "name": "Bitget API Tests",
+          "item": [
+            {
+              "id": "15135aad-bde2-4f24-96fb-fcd5c53a698d",
+              "name": "Get Ticker - BTCUSDT",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "spot",
+                    "v1",
+                    "market",
+                    "ticker"
+                  ],
+                  "host": [
+                    "{{bitget_base_url}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "symbol",
+                      "value": "BTCUSDT"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "ACCESS-KEY",
+                    "value": "{{bitget_api_key}}"
+                  },
+                  {
+                    "key": "ACCESS-TIMESTAMP",
+                    "value": "{{$timestamp}}"
+                  },
+                  {
+                    "description": {
+                      "content": "This needs to be calculated based on Bitget's signature algorithm",
+                      "type": "text/plain"
+                    },
+                    "key": "ACCESS-SIGN",
+                    "value": "SIGNATURE_PLACEHOLDER"
+                  },
+                  {
+                    "key": "ACCESS-PASSPHRASE",
+                    "value": "{{bitget_passphrase}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "067ccd8a-7eae-4947-acdd-8f59d111e938",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has correct structure', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('code');",
+                      "    pm.expect(jsonData).to.have.property('msg');",
+                      "    pm.expect(jsonData).to.have.property('data');",
+                      "});",
+                      "",
+                      "pm.test('Data has required fields for our client', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    if (jsonData.code === '00000' && jsonData.data) {",
+                      "        pm.expect(jsonData.data).to.have.property('symbol');",
+                      "        pm.expect(jsonData.data).to.have.property('lastPr');",
+                      "        pm.expect(jsonData.data).to.have.property('baseVolume');",
+                      "    }",
+                      "});"
+                    ],
+                    "_lastExecutionId": "3385ce51-bea8-4b19-a9cf-d99908b73b9d"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "a3232ff3-0360-4b1f-81c7-bea85bbcd8ed",
+              "name": "Get All Tickers",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "spot",
+                    "v1",
+                    "market",
+                    "tickers"
+                  ],
+                  "host": [
+                    "{{bitget_base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "ACCESS-KEY",
+                    "value": "{{bitget_api_key}}"
+                  },
+                  {
+                    "key": "ACCESS-TIMESTAMP",
+                    "value": "{{$timestamp}}"
+                  },
+                  {
+                    "key": "ACCESS-SIGN",
+                    "value": "SIGNATURE_PLACEHOLDER"
+                  },
+                  {
+                    "key": "ACCESS-PASSPHRASE",
+                    "value": "{{bitget_passphrase}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "fcdf2196-ca29-4e90-84f2-0d60ab710f87",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has correct structure', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('code');",
+                      "    pm.expect(jsonData).to.have.property('data');",
+                      "});",
+                      "",
+                      "pm.test('Data is array of tickers', function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    if (jsonData.code === '00000') {",
+                      "        pm.expect(jsonData.data).to.be.an('array');",
+                      "        if (jsonData.data.length > 0) {",
+                      "            const firstTicker = jsonData.data[0];",
+                      "            pm.expect(firstTicker).to.have.property('symbol');",
+                      "            pm.expect(firstTicker).to.have.property('lastPr');",
+                      "        }",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 2,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "1ee71424-7e09-4fa6-956b-536e34c838f4",
+          "httpRequestId": "0dbfd316-77c8-4739-8346-4cfce1fdc03f",
+          "scriptId": "067ccd8a-7eae-4947-acdd-8f59d111e938"
+        }
+      }
+    ],
+    "error": null
+  }
+}
