@@ -37,12 +37,6 @@ architecture:
       port: 8003
       database: "PostgreSQL"
       technology: "Go + Temporal + compensation"
-    
-    - name: "client"
-      purpose: "3rd party API connections"
-      port: "none"
-      database: "none"
-      technology: "Go + HTTP clients"
 
   communication:
     - "JWT tokens shared between all services"
@@ -141,7 +135,7 @@ coding_standards:
       - "Factory pattern for client creation"
 
 # ================================
-# TDD APPROACH (MANDATORY)
+# TDD APPROACH (MANDATORY) when not using 3rd party APIs
 # ================================
 tdd_rules:
   cycle: "RED → GREEN → REFACTOR"
@@ -164,6 +158,42 @@ tdd_rules:
   
   test_naming: "TestFunctionName_Scenario_ExpectedBehavior"
   test_structure: "Given-When-Then (Arrange-Act-Assert)"
+  
+  coverage_requirements:
+    business_logic: "90%+"
+    handlers: "85%+"
+    utilities: "80%+"
+    overall: "85%+"
+  
+
+# ================================
+# POSTMAN COLLECTIONS APPROACH (MANDATORY) WHEN USING 3rd party APIs
+# ================================
+tdd_rules:
+  cycle: "postman collections → client service → api service → refactoring"
+  
+
+  postman collections:
+    - "Write failing postman collections first"
+    - "test directly against 3rd party APIs"
+    
+  client service:
+    - "Write minimal code to copy postman collections"
+    - "Don't optimize yet"
+    - "Focus on making it work, not perfect"
+    
+  api service:
+    - "wrap client service in activities"
+    - "Improve code quality without changing behavior"
+    - "Extract common functionality"
+    - "Optimize performance if needed"
+    - "Ensure all tests still pass"
+  
+  refactoring:
+    - "Improve code quality without changing behavior"
+    - "Extract common functionality"
+    - "Optimize performance if needed"
+    - "Ensure all tests still pass"
   
   coverage_requirements:
     business_logic: "90%+"

@@ -1,0 +1,58 @@
+{
+	"id": "e8f9a234-5d78-4c12-b3a4-8e2f1a9b7c3d",
+	"name": "Temporal Service - Local Development",
+	"values": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8088",
+			"type": "default",
+			"enabled": true,
+			"description": "Base URL for Temporal API service"
+		},
+		{
+			"key": "temporal_namespace",
+			"value": "default",
+			"type": "default",
+			"enabled": true,
+			"description": "Temporal namespace for workflows"
+		},
+		{
+			"key": "temporal_task_queue",
+			"value": "afrikpay",
+			"type": "default",
+			"enabled": true,
+			"description": "Temporal task queue name"
+		},
+		{
+			"key": "timeout_seconds",
+			"value": "30",
+			"type": "default",
+			"enabled": true,
+			"description": "Workflow execution timeout in seconds"
+		},
+		{
+			"key": "test_symbol_btc",
+			"value": "BTCUSDT",
+			"type": "default",
+			"enabled": true,
+			"description": "Bitcoin trading pair for testing"
+		},
+		{
+			"key": "test_symbol_eth",
+			"value": "ETHUSDT",
+			"type": "default",
+			"enabled": true,
+			"description": "Ethereum trading pair for testing"
+		},
+		{
+			"key": "environment_name",
+			"value": "development",
+			"type": "default",
+			"enabled": true,
+			"description": "Current environment name"
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-06-30T11:51:30.000Z",
+	"_postman_exported_using": "Postman/11.0.0"
+}

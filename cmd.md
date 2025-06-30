@@ -25,3 +25,14 @@ Tu es maintenant l'architecte principal du projet Afrikpay Gateway. Ta mission e
 À CHAQUE tâche terminée, tu DOIS mettre à jour taches.md en cochant [x] et notant la date/heure.
 
 DÉMARRE MAINTENANT !
+
+
+je veux que tu crée les endpoints dans api, de temporal et les workflows associé :
+- "GET /api/exchange/binance/v1/orders (get all orders)"- "GET /api/exchange/binance/v1/quotes (get all crypto quotes)"
+
+modifie l'api le worker et ajoute les workflows correspandante, normalement le activities sont deja crée, tu peux les utiliser, si tu ne tourve pas d'activité il faut crée dabord la fonction dans le clients et ensuite tu crée l'activité 
+
+ensuite redemarre les service et fait un test E2E et regarde si tout est ok
+
+si tu as des problemes a seconnecter à l'api de biance consulte la collextion postman/Afrikpay Gateway - API Clients E2E Complete .postman_collection et regarde dans les pre-request et test elle peuvent contenir de la logique qu'on doit suivre pour appeler les differents apis, utilise cette collection pour avoir la bonne methode a suivre
+
