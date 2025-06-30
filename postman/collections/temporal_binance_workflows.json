@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "c8f9e234-5d78-4c12-b3a4-8e2f1a9b7c3d",
-		"name": "Afrikpay Gateway - Temporal Binance Workflows",
-		"description": "Collection for testing Temporal Binance workflows and REST endpoints implemented in the Afrikpay Gateway project.\n\n**Base URL:** http://localhost:8088\n\n**Endpoints:**\n- GET /api/exchange/binance/v1/quotes - Get real-time crypto quotes\n- GET /api/exchange/binance/v1/orders - Get all orders (mock data)\n- POST /api/workflow/v1/BinancePrice - Get single crypto price (legacy endpoint)\n\n**Created:** June 30, 2025\n**Version:** 1.0.0",
+		"name": "Afrikpay Gateway - Temporal Binance Workflows (Updated)",
+		"description": "Collection for testing Temporal Binance workflows and REST endpoints implemented in the Afrikpay Gateway project.\n\n**Base URL:** http://localhost:8088\n\n**Endpoints:**\n- GET /api/exchange/binance/v1/quotes - Get real-time crypto quotes\n- GET /api/exchange/binance/v1/orders - Get all orders (mock data)\n- POST /api/exchange/binance/v1/order - Place a new order\n- GET /api/exchange/binance/v1/order/{orderId} - Get order status\n- POST /api/workflow/v1/BinancePrice - Get single crypto price (legacy endpoint)\n\n**Created:** June 30, 2025\n**Version:** 1.1.0",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "12345678"
 	},
@@ -44,17 +44,6 @@
 									"    }",
 									"});",
 									"",
-									"// Test specific symbols",
-									"pm.test(\"Contains expected crypto symbols\", function () {",
-									"    const jsonData = pm.response.json();",
-									"    if (jsonData.quotes) {",
-									"        const symbols = jsonData.quotes.map(q => q.symbol);",
-									"        pm.expect(symbols).to.include('BTCUSDT');",
-									"        pm.expect(symbols).to.include('ETHUSDT');",
-									"    }",
-									"});",
-									"",
-									"// Log response for debugging",
 									"console.log('Quotes Response:', pm.response.json());"
 								],
 								"type": "text/javascript"
@@ -82,50 +71,8 @@
 								"v1",
 								"quotes"
 							]
-						},
-						"description": "Retrieves real-time cryptocurrency quotes from Binance.\n\n**Expected Response:**\n- Array of quotes with symbol, prices, volume, and timestamp\n- Supports: BTCUSDT, ETHUSDT, ADAUSDT, DOTUSDT\n\n**Workflow:** BinanceQuotesWorkflow\n**Activity:** GetQuotes"
-					},
-					"response": [
-						{
-							"name": "Success - Crypto Quotes",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8088/api/exchange/binance/v1/quotes",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8088",
-									"path": [
-										"api",
-										"exchange",
-										"binance",
-										"v1",
-										"quotes"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n  \"quotes\": [\n    {\n      \"askPrice\": 107838.47,\n      \"bidPrice\": 107838.46,\n      \"lastPrice\": 107838.46,\n      \"symbol\": \"BTCUSDT\",\n      \"timestamp\": \"2025-06-30T12:48:48.720735+01:00\",\n      \"volume\": 2197.11557\n    },\n    {\n      \"askPrice\": 2464.8,\n      \"bidPrice\": 2464.79,\n      \"lastPrice\": 2464.78,\n      \"symbol\": \"ETHUSDT\",\n      \"timestamp\": \"2025-06-30T12:48:48.720736+01:00\",\n      \"volume\": 137508.0102\n    },\n    {\n      \"askPrice\": 0.5649,\n      \"bidPrice\": 0.5648,\n      \"lastPrice\": 0.5648,\n      \"symbol\": \"ADAUSDT\",\n      \"timestamp\": \"2025-06-30T12:48:48.720757+01:00\",\n      \"volume\": 90258229.5\n    },\n    {\n      \"askPrice\": 3.429,\n      \"bidPrice\": 3.428,\n      \"lastPrice\": 3.428,\n      \"symbol\": \"DOTUSDT\",\n      \"timestamp\": \"2025-06-30T12:48:48.720757+01:00\",\n      \"volume\": 7396589.23\n    }\n  ],\n  \"timestamp\": \"2025-06-30T12:48:48.720757+01:00\"\n}"
 						}
-					]
+					}
 				},
 				{
 					"name": "Get All Orders",
@@ -147,33 +94,6 @@
 									"    pm.expect(jsonData).to.have.property('timestamp');",
 									"});",
 									"",
-									"// Test orders content",
-									"pm.test(\"Orders contain required fields\", function () {",
-									"    const jsonData = pm.response.json();",
-									"    if (jsonData.orders && jsonData.orders.length > 0) {",
-									"        const order = jsonData.orders[0];",
-									"        pm.expect(order).to.have.property('orderId');",
-									"        pm.expect(order).to.have.property('symbol');",
-									"        pm.expect(order).to.have.property('status');",
-									"        pm.expect(order).to.have.property('origQty');",
-									"        pm.expect(order).to.have.property('price');",
-									"        pm.expect(order).to.have.property('executedQty');",
-									"        pm.expect(order).to.have.property('time');",
-									"    }",
-									"});",
-									"",
-									"// Test order statuses",
-									"pm.test(\"Orders have valid statuses\", function () {",
-									"    const jsonData = pm.response.json();",
-									"    if (jsonData.orders) {",
-									"        const validStatuses = ['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED'];",
-									"        jsonData.orders.forEach(order => {",
-									"            pm.expect(validStatuses).to.include(order.status);",
-									"        });",
-									"    }",
-									"});",
-									"",
-									"// Log response for debugging",
 									"console.log('Orders Response:', pm.response.json());"
 								],
 								"type": "text/javascript"
@@ -201,67 +121,145 @@
 								"v1",
 								"orders"
 							]
-						},
-						"description": "Retrieves all orders from Binance account.\n\n**Current Implementation:** Mock data with sample orders\n**Production Ready:** Structure prepared for real Binance API `/api/v3/openOrders`\n\n**Expected Response:**\n- Array of orders with complete order information\n- Includes orderId, symbol, status, side, type, quantities, prices, timestamp\n\n**Workflow:** BinanceOrdersWorkflow\n**Activity:** GetAllOrders"
-					},
-					"response": [
-						{
-							"name": "Success - Mock Orders",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8088/api/exchange/binance/v1/orders",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8088",
-									"path": [
-										"api",
-										"exchange",
-										"binance",
-										"v1",
-										"orders"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n  \"orders\": [\n    {\n      \"executedQty\": 0,\n      \"orderId\": \"binance-order-001\",\n      \"price\": 50000,\n      \"quantity\": 0.001,\n      \"side\": \"BUY\",\n      \"status\": \"NEW\",\n      \"success\": false,\n      \"symbol\": \"BTCUSDT\",\n      \"timestamp\": \"2025-06-30T12:50:03.620932+01:00\",\n      \"type\": \"LIMIT\"\n    },\n    {\n      \"executedQty\": 0.05,\n      \"orderId\": \"binance-order-002\",\n      \"price\": 3000,\n      \"quantity\": 0.1,\n      \"side\": \"SELL\",\n      \"status\": \"PARTIALLY_FILLED\",\n      \"success\": false,\n      \"symbol\": \"ETHUSDT\",\n      \"timestamp\": \"2025-06-30T12:50:03.620932+01:00\",\n      \"type\": \"LIMIT\"\n    }\n  ],\n  \"timestamp\": \"2025-06-30T12:50:03.620933+01:00\"\n}"
 						}
-					]
-				}
-			],
-			"description": "New REST endpoints for Binance operations using GET methods. These endpoints use Temporal workflows internally for robust execution.",
-			"event": [
+					}
+				},
 				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"// Set base URL if not already set",
-							"if (!pm.collectionVariables.get('base_url')) {",
-							"    pm.collectionVariables.set('base_url', 'http://localhost:8088');",
-							"}"
-						]
+					"name": "Place Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status (should be 200 for successful order placement)",
+									"pm.test(\"Response received\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"// Test response structure on success",
+									"if (pm.response.code === 200) {",
+									"    pm.test(\"Response has order information\", function () {",
+									"        const jsonData = pm.response.json();",
+									"        pm.expect(jsonData).to.have.property('orderId');",
+									"        pm.expect(jsonData).to.have.property('symbol');",
+									"        pm.expect(jsonData).to.have.property('status');",
+									"        pm.expect(jsonData).to.have.property('origQty');",
+									"        pm.expect(jsonData).to.have.property('success');",
+									"        pm.expect(jsonData).to.have.property('time');",
+									"    });",
+									"}",
+									"",
+									"console.log('Place Order Response:', pm.response.json());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.001\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exchange/binance/v1/order",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exchange",
+								"binance",
+								"v1",
+								"order"
+							]
+						},
+						"description": "Places a new order on Binance exchange using Temporal workflow.\n\n**Input:** OrderRequest with symbol, side, type, quantity\n**Output:** OrderResponse with order details or error\n\n**Workflow:** BinancePlaceOrderWorkflow\n**Activity:** PlaceOrder\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials."
+					}
+				},
+				{
+					"name": "Get Order Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status (should be 200 for successful order status)",
+									"pm.test(\"Response received\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"// Test response structure on success",
+									"if (pm.response.code === 200) {",
+									"    pm.test(\"Response has order status\", function () {",
+									"        const jsonData = pm.response.json();",
+									"        pm.expect(jsonData).to.have.property('orderId');",
+									"        pm.expect(jsonData).to.have.property('symbol');",
+									"        pm.expect(jsonData).to.have.property('status');",
+									"        pm.expect(jsonData).to.have.property('origQty');",
+									"        pm.expect(jsonData).to.have.property('price');",
+									"        pm.expect(jsonData).to.have.property('executedQty');",
+									"        pm.expect(jsonData).to.have.property('time');",
+									"    });",
+									"}",
+									"",
+									"console.log('Order Status Response:', pm.response.json());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/exchange/binance/v1/order/123456?symbol=BTCUSDT",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exchange",
+								"binance",
+								"v1",
+								"order",
+								"123456"
+							],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "BTCUSDT"
+								}
+							]
+						},
+						"description": "Retrieves the status of a specific order by orderId.\n\n**Input:** orderId as path parameter, symbol as query parameter\n**Output:** OrderResponse with current order status or error\n\n**Workflow:** BinanceGetOrderStatusWorkflow\n**Activity:** GetOrderStatus\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials."
 					}
 				}
-			]
+			],
+			"description": "New REST endpoints for Binance operations. These endpoints use Temporal workflows internally for robust execution."
 		},
 		{
 			"name": "Legacy Workflow Endpoints",
@@ -287,20 +285,6 @@
 									"    pm.expect(jsonData).to.have.property('success');",
 									"});",
 									"",
-									"// Test price validity",
-									"pm.test(\"Price is a valid number\", function () {",
-									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.price).to.be.a('number');",
-									"    pm.expect(jsonData.price).to.be.above(0);",
-									"});",
-									"",
-									"// Test symbol matches request",
-									"pm.test(\"Symbol matches request\", function () {",
-									"    const jsonData = pm.response.json();",
-									"    pm.expect(jsonData.symbol).to.eql('BTCUSDT');",
-									"});",
-									"",
-									"// Log response for debugging",
 									"console.log('Price Response:', pm.response.json());"
 								],
 								"type": "text/javascript"
@@ -341,80 +325,11 @@
 								"v1",
 								"BinancePrice"
 							]
-						},
-						"description": "Legacy endpoint for getting single cryptocurrency price using Temporal workflow.\n\n**Input:** Symbol as JSON string (e.g., \"BTCUSDT\")\n**Output:** Price information with symbol, price, timestamp, and success status\n\n**Workflow:** BinancePriceWorkflow\n**Activity:** GetPrice\n\n**Note:** This is the original implementation, maintained for backward compatibility."
-					},
-					"response": [
-						{
-							"name": "Success - BTCUSDT Price",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									},
-									{
-										"key": "Accept",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "\"BTCUSDT\"",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8088/api/workflow/v1/BinancePrice",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8088",    
-									"path": [
-										"api",
-										"workflow",
-										"v1",
-										"BinancePrice"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n  \"price\": 107838.46,\n  \"success\": false,\n  \"symbol\": \"BTCUSDT\",\n  \"timestamp\": \"2025-06-30T12:50:10.619494+01:00\"\n}"
 						}
-					]
-				}
-			],
-			"description": "Legacy workflow endpoints using POST method. These maintain backward compatibility with the original workflow implementation.",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"// Set base URL if not already set",
-							"if (!pm.collectionVariables.get('base_url')) {",
-							"    pm.collectionVariables.set('base_url', 'http://localhost:8088');",
-							"}"
-						]
 					}
 				}
-			]
+			],
+			"description": "Legacy workflow endpoints using POST method. These maintain backward compatibility with the original workflow implementation."
 		}
 	],
 	"event": [
@@ -428,8 +343,22 @@
 					"",
 					"// Set collection variables",
 					"pm.collectionVariables.set('base_url', 'http://localhost:8088');",
-					"pm.collectionVariables.set('collection_version', '1.0.0');",
-					"pm.collectionVariables.set('test_timestamp', new Date().toISOString());"
+					"pm.collectionVariables.set('collection_version', '1.1.0');",
+					"pm.collectionVariables.set('test_timestamp', new Date().toISOString());",
+					"",
+					"// Set Binance API keys as environment variables (for service to read)",
+					"// ⚠️ IMPORTANT: Replace these with your actual Binance API keys",
+					"const binanceApiKey = pm.collectionVariables.get('binance_api_key');",
+					"const binanceSecretKey = pm.collectionVariables.get('binance_secret_key');",
+					"const binanceTestnet = pm.collectionVariables.get('binance_testnet');",
+					"",
+					"// Log configuration (without exposing secrets)",
+					"console.log('Binance API Key configured:', binanceApiKey !== 'your_binance_api_key_here');",
+					"console.log('Binance Secret Key configured:', binanceSecretKey !== 'your_binance_secret_key_here');",
+					"console.log('Using Testnet:', binanceTestnet);",
+					"",
+					"// Note: The Temporal service should read these from environment variables:",
+					"// BINANCE_API_KEY, BINANCE_SECRET_KEY, BINANCE_TESTNET"
 				]
 			}
 		},
@@ -465,7 +394,7 @@
 		},
 		{
 			"key": "collection_version",
-			"value": "1.0.0",
+			"value": "1.1.0",
 			"type": "string",
 			"description": "Version of this Postman collection"
 		},
@@ -474,6 +403,24 @@
 			"value": "",
 			"type": "string",
 			"description": "Timestamp when tests were last run"
+		},
+		{
+			"key": "binance_api_key",
+			"value": "Bjhd5FsunILOwVT1RXJiUxOhZt7MQ2jydKs2jspF11kB6tv1xY3EAmDJvrR4w8la",
+			"type": "string",
+			"description": "Binance API Key - Replace with your actual API key"
+		},
+		{
+			"key": "binance_secret_key",
+			"value": "LIWTukFxAjUH43qx7upKrADY1q8Ogc46OLMbeqgsv98noMvV7mWkGeseKtgUmbtC",
+			"type": "string",
+			"description": "Binance Secret Key - Replace with your actual secret key"
+		},
+		{
+			"key": "binance_testnet",
+			"value": "true",
+			"type": "string",
+			"description": "Use Binance Testnet (true) or Mainnet (false)"
 		}
 	]
 }

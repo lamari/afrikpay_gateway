@@ -74,22 +74,67 @@ func BinanceOrdersWorkflow(ctx workflow.Context) (*models.OrdersResponse, error)
 	logger := workflow.GetLogger(ctx)
 	logger.Info("BinanceOrdersWorkflow started")
 
-	// Configure activity options
-	activityOptions := workflow.ActivityOptions{
-		StartToCloseTimeout: 30 * time.Second,
+	ao := workflow.ActivityOptions{
+		StartToCloseTimeout: time.Minute,
 	}
-	ctx = workflow.WithActivityOptions(ctx, activityOptions)
+	ctx = workflow.WithActivityOptions(ctx, ao)
 
-	// Execute GetAllOrders activity
-	var ordersResponse models.OrdersResponse
-	err := workflow.ExecuteActivity(ctx, "GetAllOrders").Get(ctx, &ordersResponse)
+	var result *models.OrdersResponse
+	err := workflow.ExecuteActivity(ctx, "GetAllOrders").Get(ctx, &result)
 	if err != nil {
-		logger.Error("Failed to get Binance orders", "error", err)
+		workflow.GetLogger(ctx).Error("Failed to get orders", "error", err)
 		return nil, err
 	}
 
-	logger.Info("BinanceOrdersWorkflow completed successfully", "orders_count", len(ordersResponse.Orders))
-	return &ordersResponse, nil
+	return result, nil
+}
+
+// BinancePlaceOrderWorkflow places a new order on Binance
+func BinancePlaceOrderWorkflow(ctx workflow.Context, request *models.OrderRequest) (*models.OrderResponse, error) {
+	// Validate input
+	if request == nil {
+		return nil, fmt.Errorf("order request cannot be nil")
+	}
+
+	ao := workflow.ActivityOptions{
+		StartToCloseTimeout: time.Minute,
+	}
+	ctx = workflow.WithActivityOptions(ctx, ao)
+
+	var result *models.OrderResponse
+	err := workflow.ExecuteActivity(ctx, "PlaceOrder", request).Get(ctx, &result)
+	if err != nil {
+		workflow.GetLogger(ctx).Error("Failed to place order", "error", err, "symbol", request.Symbol, "side", request.Side)
+		return nil, err
+	}
+
+	workflow.GetLogger(ctx).Info("Order placed successfully", "orderId", result.OrderID, "symbol", result.Symbol)
+	return result, nil
+}
+
+// BinanceGetOrderStatusWorkflow gets the status of a specific order
+func BinanceGetOrderStatusWorkflow(ctx workflow.Context, symbol string, orderID string) (*models.OrderResponse, error) {
+	// Validate inputs
+	if symbol == "" {
+		return nil, fmt.Errorf("symbol cannot be empty")
+	}
+	if orderID == "" {
+		return nil, fmt.Errorf("orderID cannot be empty")
+	}
+
+	ao := workflow.ActivityOptions{
+		StartToCloseTimeout: time.Minute,
+	}
+	ctx = workflow.WithActivityOptions(ctx, ao)
+
+	var result *models.OrderResponse
+	err := workflow.ExecuteActivity(ctx, "GetOrderStatus", symbol, orderID).Get(ctx, &result)
+	if err != nil {
+		workflow.GetLogger(ctx).Error("Failed to get order status", "error", err, "symbol", symbol, "orderId", orderID)
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // BinancePriceWorkflowWithInput is a wrapper that accepts structured input

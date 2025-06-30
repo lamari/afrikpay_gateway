@@ -2,9 +2,13 @@ package clients
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -142,28 +146,158 @@ func (c *BinanceClient) getPrice(ctx context.Context, symbol string) (*models.Pr
 
 // placeOrder places an order on Binance
 func (c *BinanceClient) placeOrder(ctx context.Context, request *models.OrderRequest) (*models.OrderResponse, error) {
-	// Implementation would go here - simplified for now
+	// Validate the request
+	if err := request.Validate(); err != nil {
+		return nil, err
+	}
+
+	// Build parameters
+	params := url.Values{}
+	params.Set("symbol", request.Symbol)
+	params.Set("side", request.Side)
+	params.Set("type", request.Type)
+	params.Set("quantity", fmt.Sprintf("%.8f", request.Quantity))
+
+	if request.Type == "LIMIT" {
+		params.Set("price", fmt.Sprintf("%.8f", request.Price))
+		params.Set("timeInForce", "GTC") // Good Till Canceled
+	}
+
+	// Add timestamp
+	timestamp := time.Now().UnixMilli()
+	params.Set("timestamp", strconv.FormatInt(timestamp, 10))
+
+	// Create signature
+	queryString := params.Encode()
+	signature := c.generateSignature(queryString)
+	params.Set("signature", signature)
+
+	// Create request
+	apiURL := fmt.Sprintf("%s/api/v3/order", c.config.BaseURL)
+	req, err := http.NewRequestWithContext(ctx, "POST", apiURL+"?"+params.Encode(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add headers
+	req.Header.Set("X-MBX-APIKEY", c.config.APIKey)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	// Execute request
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("binance API error: status %d", resp.StatusCode)
+	}
+
+	// Parse response
+	var binanceResp struct {
+		Symbol              string `json:"symbol"`
+		OrderID             int64  `json:"orderId"`
+		OrderListID         int64  `json:"orderListId"`
+		ClientOrderID       string `json:"clientOrderId"`
+		TransactTime        int64  `json:"transactTime"`
+		Price               string `json:"price"`
+		OrigQty             string `json:"origQty"`
+		ExecutedQty         string `json:"executedQty"`
+		CummulativeQuoteQty string `json:"cummulativeQuoteQty"`
+		Status              string `json:"status"`
+		TimeInForce         string `json:"timeInForce"`
+		Type                string `json:"type"`
+		Side                string `json:"side"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&binanceResp); err != nil {
+		return nil, err
+	}
+
 	return &models.OrderResponse{
-		OrderID:     fmt.Sprintf("binance-%d", time.Now().Unix()),
-		Symbol:      request.Symbol,
-		Status:      "FILLED",
-		Side:        request.Side,
-		Type:        request.Type,
-		Quantity:    request.Quantity,
-		Price:       request.Price,
-		ExecutedQty: request.Quantity,
-		Timestamp:   time.Now(),
+		OrderID:     strconv.FormatInt(binanceResp.OrderID, 10),
+		Symbol:      binanceResp.Symbol,
+		Status:      binanceResp.Status,
+		Side:        binanceResp.Side,
+		Type:        binanceResp.Type,
+		Quantity:    parseFloat(binanceResp.OrigQty),
+		Price:       parseFloat(binanceResp.Price),
+		ExecutedQty: parseFloat(binanceResp.ExecutedQty),
+		Timestamp:   time.UnixMilli(binanceResp.TransactTime),
+		Success:     true,
 	}, nil
 }
 
 // getOrderStatus gets order status from Binance
 func (c *BinanceClient) getOrderStatus(ctx context.Context, symbol string, orderID string) (*models.OrderResponse, error) {
-	// Implementation would go here - simplified for now
+	// Build parameters
+	params := url.Values{}
+	params.Set("symbol", symbol)
+	params.Set("orderId", orderID)
+
+	// Add timestamp
+	timestamp := time.Now().UnixMilli()
+	params.Set("timestamp", strconv.FormatInt(timestamp, 10))
+
+	// Create signature
+	queryString := params.Encode()
+	signature := c.generateSignature(queryString)
+	params.Set("signature", signature)
+
+	// Create request
+	apiURL := fmt.Sprintf("%s/api/v3/order?%s", c.config.BaseURL, params.Encode())
+	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add headers
+	req.Header.Set("X-MBX-APIKEY", c.config.APIKey)
+
+	// Execute request
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("binance API error: status %d", resp.StatusCode)
+	}
+
+	// Parse response
+	var binanceResp struct {
+		Symbol              string `json:"symbol"`
+		OrderID             int64  `json:"orderId"`
+		OrderListID         int64  `json:"orderListId"`
+		ClientOrderID       string `json:"clientOrderId"`
+		Price               string `json:"price"`
+		OrigQty             string `json:"origQty"`
+		ExecutedQty         string `json:"executedQty"`
+		CummulativeQuoteQty string `json:"cummulativeQuoteQty"`
+		Status              string `json:"status"`
+		TimeInForce         string `json:"timeInForce"`
+		Type                string `json:"type"`
+		Side                string `json:"side"`
+		UpdateTime          int64  `json:"updateTime"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&binanceResp); err != nil {
+		return nil, err
+	}
+
 	return &models.OrderResponse{
-		OrderID:   orderID,
-		Symbol:    symbol,
-		Status:    "FILLED",
-		Timestamp: time.Now(),
+		OrderID:     strconv.FormatInt(binanceResp.OrderID, 10),
+		Symbol:      binanceResp.Symbol,
+		Status:      binanceResp.Status,
+		Side:        binanceResp.Side,
+		Type:        binanceResp.Type,
+		Quantity:    parseFloat(binanceResp.OrigQty),
+		Price:       parseFloat(binanceResp.Price),
+		ExecutedQty: parseFloat(binanceResp.ExecutedQty),
+		Timestamp:   time.UnixMilli(binanceResp.UpdateTime),
+		Success:     true,
 	}, nil
 }
 
@@ -172,14 +306,14 @@ func (c *BinanceClient) getQuotes(ctx context.Context) (*models.QuotesResponse, 
 	// Get quotes for common trading pairs
 	symbols := []string{"BTCUSDT", "ETHUSDT", "ADAUSDT", "DOTUSDT"}
 	
-	// Format symbols for Binance API
-	symbolsParam := "[\"" + symbols[0]
+	// Format symbols for Binance API with proper URL encoding
+	symbolsJSON := "[\"" + symbols[0]
 	for i := 1; i < len(symbols); i++ {
-		symbolsParam += "\",\"" + symbols[i]
+		symbolsJSON += "\",\"" + symbols[i]
 	}
-	symbolsParam += "\"]"
+	symbolsJSON += "\"]"
 	
-	url := fmt.Sprintf("%s/api/v3/ticker/24hr?symbols=%s", c.config.BaseURL, symbolsParam)
+	url := fmt.Sprintf("%s/api/v3/ticker/24hr?symbols=%s", c.config.BaseURL, url.QueryEscape(symbolsJSON))
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -281,6 +415,13 @@ func (c *BinanceClient) getAllOrders(ctx context.Context) (*models.OrdersRespons
 		Orders:    orders,
 		Timestamp: time.Now(),
 	}, nil
+}
+
+// generateSignature generates HMAC-SHA256 signature for Binance API
+func (c *BinanceClient) generateSignature(queryString string) string {
+	h := hmac.New(sha256.New, []byte(c.config.SecretKey))
+	h.Write([]byte(queryString))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // healthCheck performs health check against Binance API

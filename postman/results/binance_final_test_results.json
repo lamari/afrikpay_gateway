@@ -1,0 +1,3656 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "c8f9e234-5d78-4c12-b3a4-8e2f1a9b7c3d",
+      "exporter_id": "12345678"
+    },
+    "item": [
+      {
+        "id": "06cffa07-45e9-4afc-a0e4-9a6689fbd4eb",
+        "name": "Binance REST Endpoints",
+        "description": {
+          "content": "New REST endpoints for Binance operations. These endpoints use Temporal workflows internally for robust execution.",
+          "type": "text/plain"
+        },
+        "item": [
+          {
+            "id": "5d7aded4-9724-478f-84f6-8b9d6ba69b67",
+            "name": "Get Crypto Quotes",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "exchange",
+                  "binance",
+                  "v1",
+                  "quotes"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "d5821c20-2be6-489c-97c6-b2d05bd1166a",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// Test response status",
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "// Test response structure",
+                    "pm.test(\"Response has quotes array\", function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('quotes');",
+                    "    pm.expect(jsonData.quotes).to.be.an('array');",
+                    "    pm.expect(jsonData).to.have.property('timestamp');",
+                    "});",
+                    "",
+                    "// Test quotes content",
+                    "pm.test(\"Quotes contain required fields\", function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    if (jsonData.quotes && jsonData.quotes.length > 0) {",
+                    "        const quote = jsonData.quotes[0];",
+                    "        pm.expect(quote).to.have.property('symbol');",
+                    "        pm.expect(quote).to.have.property('lastPrice');",
+                    "        pm.expect(quote).to.have.property('askPrice');",
+                    "        pm.expect(quote).to.have.property('bidPrice');",
+                    "        pm.expect(quote).to.have.property('volume');",
+                    "        pm.expect(quote).to.have.property('timestamp');",
+                    "    }",
+                    "});",
+                    "",
+                    "console.log('Quotes Response:', pm.response.json());"
+                  ],
+                  "_lastExecutionId": "f4561cb5-7a93-4ff3-bead-0a886dcc8741"
+                }
+              }
+            ]
+          },
+          {
+            "id": "50c08f05-3ce0-4d8f-b317-6503b2479e1b",
+            "name": "Get All Orders",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "exchange",
+                  "binance",
+                  "v1",
+                  "orders"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "11f30b67-1df8-4da1-80f3-dfdb1553d8a3",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// Test response status",
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "// Test response structure",
+                    "pm.test(\"Response has orders array\", function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('orders');",
+                    "    pm.expect(jsonData.orders).to.be.an('array');",
+                    "    pm.expect(jsonData).to.have.property('timestamp');",
+                    "});",
+                    "",
+                    "console.log('Orders Response:', pm.response.json());"
+                  ],
+                  "_lastExecutionId": "fbc83392-5f07-464b-94af-c47a73c9cc5a"
+                }
+              }
+            ]
+          },
+          {
+            "id": "bac9a2da-8608-40f5-b403-6ea2cf638d98",
+            "name": "Place Order",
+            "request": {
+              "description": {
+                "content": "Places a new order on Binance exchange using Temporal workflow.\n\n**Input:** OrderRequest with symbol, side, type, quantity\n**Output:** OrderResponse with order details or error\n\n**Workflow:** BinancePlaceOrderWorkflow\n**Activity:** PlaceOrder\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+                "type": "text/plain"
+              },
+              "url": {
+                "path": [
+                  "api",
+                  "exchange",
+                  "binance",
+                  "v1",
+                  "order"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.001\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "f3d7bcbe-fb2e-41d1-bf34-3c3c662f5d30",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// Test response status (may be 200 or 500 depending on API keys)",
+                    "pm.test(\"Response received\", function () {",
+                    "    pm.expect([200, 500]).to.include(pm.response.code);",
+                    "});",
+                    "",
+                    "// Test response structure on success",
+                    "if (pm.response.code === 200) {",
+                    "    pm.test(\"Response has order information\", function () {",
+                    "        const jsonData = pm.response.json();",
+                    "        pm.expect(jsonData).to.have.property('orderId');",
+                    "        pm.expect(jsonData).to.have.property('symbol');",
+                    "        pm.expect(jsonData).to.have.property('status');",
+                    "        pm.expect(jsonData).to.have.property('side');",
+                    "        pm.expect(jsonData).to.have.property('type');",
+                    "        pm.expect(jsonData).to.have.property('quantity');",
+                    "        pm.expect(jsonData).to.have.property('timestamp');",
+                    "    });",
+                    "}",
+                    "",
+                    "console.log('Place Order Response:', pm.response.json());"
+                  ],
+                  "_lastExecutionId": "ffed82a8-7a40-4077-9af4-608766394428"
+                }
+              }
+            ]
+          },
+          {
+            "id": "40fd8f91-f40b-4456-a2e7-cadcd3b48130",
+            "name": "Get Order Status",
+            "request": {
+              "description": {
+                "content": "Retrieves the status of a specific order by orderId.\n\n**Input:** orderId as path parameter, symbol as query parameter\n**Output:** OrderResponse with current order status or error\n\n**Workflow:** BinanceGetOrderStatusWorkflow\n**Activity:** GetOrderStatus\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+                "type": "text/plain"
+              },
+              "url": {
+                "path": [
+                  "api",
+                  "exchange",
+                  "binance",
+                  "v1",
+                  "order",
+                  "123456"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [
+                  {
+                    "key": "symbol",
+                    "value": "BTCUSDT"
+                  }
+                ],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "60c1d4fe-d880-4886-a70b-7742835fb136",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// Test response status (may be 200 or 500 depending on API keys)",
+                    "pm.test(\"Response received\", function () {",
+                    "    pm.expect([200, 500]).to.include(pm.response.code);",
+                    "});",
+                    "",
+                    "// Test response structure on success",
+                    "if (pm.response.code === 200) {",
+                    "    pm.test(\"Response has order status\", function () {",
+                    "        const jsonData = pm.response.json();",
+                    "        pm.expect(jsonData).to.have.property('orderId');",
+                    "        pm.expect(jsonData).to.have.property('symbol');",
+                    "        pm.expect(jsonData).to.have.property('status');",
+                    "        pm.expect(jsonData).to.have.property('side');",
+                    "        pm.expect(jsonData).to.have.property('type');",
+                    "        pm.expect(jsonData).to.have.property('quantity');",
+                    "        pm.expect(jsonData).to.have.property('timestamp');",
+                    "    });",
+                    "}",
+                    "",
+                    "console.log('Order Status Response:', pm.response.json());"
+                  ],
+                  "_lastExecutionId": "749e9e8a-39d2-4772-a21b-e9985078adde"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "3329792a-268d-4c65-8636-0273fee38caf",
+        "name": "Legacy Workflow Endpoints",
+        "description": {
+          "content": "Legacy workflow endpoints using POST method. These maintain backward compatibility with the original workflow implementation.",
+          "type": "text/plain"
+        },
+        "item": [
+          {
+            "id": "143a2e30-538d-4f34-b938-02ca1f7d8f95",
+            "name": "Get Binance Price (Legacy)",
+            "request": {
+              "url": {
+                "path": [
+                  "api",
+                  "workflow",
+                  "v1",
+                  "BinancePrice"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "\"BTCUSDT\"",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "f1eb4032-be62-4ae2-88af-1a39fed6885b",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// Test response status",
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "// Test response structure",
+                    "pm.test(\"Response has price information\", function () {",
+                    "    const jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('symbol');",
+                    "    pm.expect(jsonData).to.have.property('price');",
+                    "    pm.expect(jsonData).to.have.property('timestamp');",
+                    "    pm.expect(jsonData).to.have.property('success');",
+                    "});",
+                    "",
+                    "console.log('Price Response:', pm.response.json());"
+                  ],
+                  "_lastExecutionId": "df0e3882-604f-48d3-82a3-7ce8f218c68b"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "id": "0d1bdf57-cb96-47bb-8311-fb70a6b785c8",
+          "type": "text/javascript",
+          "exec": [
+            "// Global pre-request script",
+            "console.log('Testing Temporal Binance Workflows...');",
+            "",
+            "// Set collection variables",
+            "pm.collectionVariables.set('base_url', 'http://localhost:8088');",
+            "pm.collectionVariables.set('collection_version', '1.1.0');",
+            "pm.collectionVariables.set('test_timestamp', new Date().toISOString());",
+            "",
+            "// Set Binance API keys as environment variables (for service to read)",
+            "// ⚠️ IMPORTANT: Replace these with your actual Binance API keys",
+            "const binanceApiKey = pm.collectionVariables.get('binance_api_key');",
+            "const binanceSecretKey = pm.collectionVariables.get('binance_secret_key');",
+            "const binanceTestnet = pm.collectionVariables.get('binance_testnet');",
+            "",
+            "// Log configuration (without exposing secrets)",
+            "console.log('Binance API Key configured:', binanceApiKey !== 'your_binance_api_key_here');",
+            "console.log('Binance Secret Key configured:', binanceSecretKey !== 'your_binance_secret_key_here');",
+            "console.log('Using Testnet:', binanceTestnet);",
+            "",
+            "// Note: The Temporal service should read these from environment variables:",
+            "// BINANCE_API_KEY, BINANCE_SECRET_KEY, BINANCE_TESTNET"
+          ],
+          "_lastExecutionId": "23879fa5-7a78-465b-b636-786c9377c38b"
+        }
+      },
+      {
+        "listen": "test",
+        "script": {
+          "id": "89165b3e-a0a0-4bff-929d-9384ca2b4ddf",
+          "type": "text/javascript",
+          "exec": [
+            "// Global test script - runs after every request",
+            "",
+            "// Check response time",
+            "pm.test(\"Response time is acceptable\", function () {",
+            "    pm.expect(pm.response.responseTime).to.be.below(30000); // 30 seconds max",
+            "});",
+            "",
+            "// Check content type",
+            "pm.test(\"Content-Type is application/json\", function () {",
+            "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+            "});",
+            "",
+            "// Log basic request info",
+            "console.log(`${pm.info.requestName}: ${pm.response.status} (${pm.response.responseTime}ms)`);"
+          ],
+          "_lastExecutionId": "7f09b400-9fae-433d-b3e7-9e94c321a6fd"
+        }
+      }
+    ],
+    "variable": [
+      {
+        "description": {
+          "content": "Base URL for the Temporal API service",
+          "type": "text/plain"
+        },
+        "type": "string",
+        "value": "http://localhost:8088",
+        "key": "base_url"
+      },
+      {
+        "description": {
+          "content": "Version of this Postman collection",
+          "type": "text/plain"
+        },
+        "type": "string",
+        "value": "1.1.0",
+        "key": "collection_version"
+      },
+      {
+        "description": {
+          "content": "Timestamp when tests were last run",
+          "type": "text/plain"
+        },
+        "type": "string",
+        "value": "",
+        "key": "test_timestamp"
+      },
+      {
+        "description": {
+          "content": "Binance API Key - Replace with your actual API key",
+          "type": "text/plain"
+        },
+        "type": "string",
+        "value": "Bjhd5FsunILOwVT1RXJiUxOhZt7MQ2jydKs2jspF11kB6tv1xY3EAmDJvrR4w8la",
+        "key": "binance_api_key"
+      },
+      {
+        "description": {
+          "content": "Binance Secret Key - Replace with your actual secret key",
+          "type": "text/plain"
+        },
+        "type": "string",
+        "value": "LIWTukFxAjUH43qx7upKrADY1q8Ogc46OLMbeqgsv98noMvV7mWkGeseKtgUmbtC",
+        "key": "binance_secret_key"
+      },
+      {
+        "description": {
+          "content": "Use Binance Testnet (true) or Mainnet (false)",
+          "type": "text/plain"
+        },
+        "type": "string",
+        "value": "true",
+        "key": "binance_testnet"
+      }
+    ],
+    "info": {
+      "_postman_id": "c8f9e234-5d78-4c12-b3a4-8e2f1a9b7c3d",
+      "name": "Afrikpay Gateway - Temporal Binance Workflows (Updated)",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Collection for testing Temporal Binance workflows and REST endpoints implemented in the Afrikpay Gateway project.\n\n**Base URL:** http://localhost:8088\n\n**Endpoints:**\n- GET /api/exchange/binance/v1/quotes - Get real-time crypto quotes\n- GET /api/exchange/binance/v1/orders - Get all orders (mock data)\n- POST /api/exchange/binance/v1/order - Place a new order\n- GET /api/exchange/binance/v1/order/{orderId} - Get order status\n- POST /api/workflow/v1/BinancePrice - Get single crypto price (legacy endpoint)\n\n**Created:** June 30, 2025\n**Version:** 1.1.0",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "id": "c6f2c593-0787-48f7-975b-8f89185d9359",
+    "values": []
+  },
+  "globals": {
+    "id": "6cac0e53-2fd5-455e-9b8e-aa35da661d65",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 15,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 20,
+        "pending": 0,
+        "failed": 2
+      },
+      "testScripts": {
+        "total": 10,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 3.2,
+      "responseMin": 1,
+      "responseMax": 12,
+      "responseSd": 4.4,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1751288017318,
+      "completed": 1751288017424
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 5,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "8d8c40af-3556-4f7d-9351-ae91a895d3a4",
+          "httpRequestId": "de4eb83e-33c8-4e65-a5b7-7e2fe7e34391"
+        },
+        "item": {
+          "id": "5d7aded4-9724-478f-84f6-8b9d6ba69b67",
+          "name": "Get Crypto Quotes",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "exchange",
+                "binance",
+                "v1",
+                "quotes"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d5821c20-2be6-489c-97c6-b2d05bd1166a",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test response status",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test response structure",
+                  "pm.test(\"Response has quotes array\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('quotes');",
+                  "    pm.expect(jsonData.quotes).to.be.an('array');",
+                  "    pm.expect(jsonData).to.have.property('timestamp');",
+                  "});",
+                  "",
+                  "// Test quotes content",
+                  "pm.test(\"Quotes contain required fields\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.quotes && jsonData.quotes.length > 0) {",
+                  "        const quote = jsonData.quotes[0];",
+                  "        pm.expect(quote).to.have.property('symbol');",
+                  "        pm.expect(quote).to.have.property('lastPrice');",
+                  "        pm.expect(quote).to.have.property('askPrice');",
+                  "        pm.expect(quote).to.have.property('bidPrice');",
+                  "        pm.expect(quote).to.have.property('volume');",
+                  "        pm.expect(quote).to.have.property('timestamp');",
+                  "    }",
+                  "});",
+                  "",
+                  "console.log('Quotes Response:', pm.response.json());"
+                ],
+                "_lastExecutionId": "f4561cb5-7a93-4ff3-bead-0a886dcc8741"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8088",
+            "path": [
+              "api",
+              "exchange",
+              "binance",
+              "v1",
+              "quotes"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.37.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "14d81b2a-9b97-40ea-8a86-071977c44f99",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8088",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "aa5f411b-ded9-441c-8784-29530d6ca64d",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 30 Jun 2025 12:53:37 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "589"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              113,
+              117,
+              111,
+              116,
+              101,
+              115,
+              34,
+              58,
+              91,
+              123,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              66,
+              84,
+              67,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              108,
+              97,
+              115,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              48,
+              55,
+              56,
+              51,
+              56,
+              46,
+              52,
+              54,
+              34,
+              44,
+              34,
+              97,
+              115,
+              107,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              48,
+              55,
+              56,
+              52,
+              48,
+              46,
+              53,
+              48,
+              34,
+              44,
+              34,
+              98,
+              105,
+              100,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              48,
+              55,
+              56,
+              51,
+              53,
+              46,
+              50,
+              53,
+              34,
+              44,
+              34,
+              118,
+              111,
+              108,
+              117,
+              109,
+              101,
+              34,
+              58,
+              34,
+              49,
+              50,
+              51,
+              52,
+              46,
+              53,
+              54,
+              55,
+              56,
+              57,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              115,
+              116,
+              97,
+              109,
+              112,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              51,
+              52,
+              49,
+              34,
+              125,
+              44,
+              123,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              69,
+              84,
+              72,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              108,
+              97,
+              115,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              51,
+              57,
+              52,
+              53,
+              46,
+              54,
+              55,
+              34,
+              44,
+              34,
+              97,
+              115,
+              107,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              51,
+              57,
+              52,
+              54,
+              46,
+              49,
+              50,
+              34,
+              44,
+              34,
+              98,
+              105,
+              100,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              51,
+              57,
+              52,
+              53,
+              46,
+              50,
+              51,
+              34,
+              44,
+              34,
+              118,
+              111,
+              108,
+              117,
+              109,
+              101,
+              34,
+              58,
+              34,
+              57,
+              56,
+              55,
+              54,
+              46,
+              53,
+              52,
+              51,
+              50,
+              49,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              115,
+              116,
+              97,
+              109,
+              112,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              51,
+              52,
+              49,
+              34,
+              125,
+              44,
+              123,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              65,
+              68,
+              65,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              108,
+              97,
+              115,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              48,
+              46,
+              56,
+              57,
+              50,
+              53,
+              34,
+              44,
+              34,
+              97,
+              115,
+              107,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              48,
+              46,
+              56,
+              57,
+              51,
+              48,
+              34,
+              44,
+              34,
+              98,
+              105,
+              100,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              48,
+              46,
+              56,
+              57,
+              50,
+              48,
+              34,
+              44,
+              34,
+              118,
+              111,
+              108,
+              117,
+              109,
+              101,
+              34,
+              58,
+              34,
+              49,
+              53,
+              54,
+              55,
+              56,
+              46,
+              57,
+              56,
+              55,
+              54,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              115,
+              116,
+              97,
+              109,
+              112,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              51,
+              52,
+              49,
+              34,
+              125,
+              44,
+              123,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              68,
+              79,
+              84,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              108,
+              97,
+              115,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              56,
+              46,
+              52,
+              53,
+              34,
+              44,
+              34,
+              97,
+              115,
+              107,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              56,
+              46,
+              52,
+              55,
+              34,
+              44,
+              34,
+              98,
+              105,
+              100,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              56,
+              46,
+              52,
+              51,
+              34,
+              44,
+              34,
+              118,
+              111,
+              108,
+              117,
+              109,
+              101,
+              34,
+              58,
+              34,
+              53,
+              52,
+              51,
+              50,
+              46,
+              49,
+              48,
+              57,
+              56,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              115,
+              116,
+              97,
+              109,
+              112,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              51,
+              52,
+              49,
+              34,
+              125,
+              93,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              115,
+              116,
+              97,
+              109,
+              112,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              53,
+              45,
+              48,
+              54,
+              45,
+              51,
+              48,
+              84,
+              49,
+              51,
+              58,
+              53,
+              51,
+              58,
+              51,
+              55,
+              43,
+              48,
+              49,
+              58,
+              48,
+              48,
+              34,
+              125,
+              10
+            ]
+          },
+          "cookie": [],
+          "responseTime": 12,
+          "responseSize": 589
+        },
+        "id": "5d7aded4-9724-478f-84f6-8b9d6ba69b67",
+        "assertions": [
+          {
+            "assertion": "Response time is acceptable",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type is application/json",
+            "skipped": false
+          },
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has quotes array",
+            "skipped": false
+          },
+          {
+            "assertion": "Quotes contain required fields",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "9d422283-c956-42bb-bcaf-fcc5c93ec9b9",
+          "length": 5,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "bac1b6cc-6b58-4052-b688-5064ffc9cb81"
+        },
+        "item": {
+          "id": "50c08f05-3ce0-4d8f-b317-6503b2479e1b",
+          "name": "Get All Orders",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "exchange",
+                "binance",
+                "v1",
+                "orders"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "11f30b67-1df8-4da1-80f3-dfdb1553d8a3",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test response status",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test response structure",
+                  "pm.test(\"Response has orders array\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('orders');",
+                  "    pm.expect(jsonData.orders).to.be.an('array');",
+                  "    pm.expect(jsonData).to.have.property('timestamp');",
+                  "});",
+                  "",
+                  "console.log('Orders Response:', pm.response.json());"
+                ],
+                "_lastExecutionId": "fbc83392-5f07-464b-94af-c47a73c9cc5a"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8088",
+            "path": [
+              "api",
+              "exchange",
+              "binance",
+              "v1",
+              "orders"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.37.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "eac30f63-dcc7-43e4-8c5a-b0e8d3106224",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8088",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "479c4c69-4dd7-4f17-9c61-1e39f92e171d",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 30 Jun 2025 12:53:37 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "469"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              111,
+              114,
+              100,
+              101,
+              114,
+              115,
+              34,
+              58,
+              91,
+              123,
+              34,
+              111,
+              114,
+              100,
+              101,
+              114,
+              73,
+              100,
+              34,
+              58,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              55,
+              56,
+              44,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              66,
+              84,
+              67,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              70,
+              73,
+              76,
+              76,
+              69,
+              68,
+              34,
+              44,
+              34,
+              111,
+              114,
+              105,
+              103,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              48,
+              46,
+              48,
+              48,
+              49,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              48,
+              55,
+              56,
+              48,
+              48,
+              46,
+              48,
+              48,
+              34,
+              44,
+              34,
+              101,
+              120,
+              101,
+              99,
+              117,
+              116,
+              101,
+              100,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              48,
+              46,
+              48,
+              48,
+              49,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              51,
+              54,
+              53,
+              34,
+              125,
+              44,
+              123,
+              34,
+              111,
+              114,
+              100,
+              101,
+              114,
+              73,
+              100,
+              34,
+              58,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              55,
+              57,
+              44,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              69,
+              84,
+              72,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              80,
+              65,
+              82,
+              84,
+              73,
+              65,
+              76,
+              76,
+              89,
+              95,
+              70,
+              73,
+              76,
+              76,
+              69,
+              68,
+              34,
+              44,
+              34,
+              111,
+              114,
+              105,
+              103,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              48,
+              46,
+              53,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              51,
+              57,
+              52,
+              48,
+              46,
+              48,
+              48,
+              34,
+              44,
+              34,
+              101,
+              120,
+              101,
+              99,
+              117,
+              116,
+              101,
+              100,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              48,
+              46,
+              50,
+              53,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              51,
+              54,
+              53,
+              34,
+              125,
+              44,
+              123,
+              34,
+              111,
+              114,
+              100,
+              101,
+              114,
+              73,
+              100,
+              34,
+              58,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              56,
+              48,
+              44,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              65,
+              68,
+              65,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              78,
+              69,
+              87,
+              34,
+              44,
+              34,
+              111,
+              114,
+              105,
+              103,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              49,
+              48,
+              48,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              48,
+              46,
+              56,
+              57,
+              48,
+              48,
+              34,
+              44,
+              34,
+              101,
+              120,
+              101,
+              99,
+              117,
+              116,
+              101,
+              100,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              48,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              51,
+              54,
+              53,
+              34,
+              125,
+              93,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              115,
+              116,
+              97,
+              109,
+              112,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              53,
+              45,
+              48,
+              54,
+              45,
+              51,
+              48,
+              84,
+              49,
+              51,
+              58,
+              53,
+              51,
+              58,
+              51,
+              55,
+              43,
+              48,
+              49,
+              58,
+              48,
+              48,
+              34,
+              125,
+              10
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1,
+          "responseSize": 469
+        },
+        "id": "50c08f05-3ce0-4d8f-b317-6503b2479e1b",
+        "assertions": [
+          {
+            "assertion": "Response time is acceptable",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type is application/json",
+            "skipped": false
+          },
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has orders array",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "a0d8c4d9-2e15-470a-842f-1cd1a60c2164",
+          "length": 5,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "d4a42848-46e6-4d23-a417-9bad7a19e561"
+        },
+        "item": {
+          "id": "bac9a2da-8608-40f5-b403-6ea2cf638d98",
+          "name": "Place Order",
+          "request": {
+            "description": {
+              "content": "Places a new order on Binance exchange using Temporal workflow.\n\n**Input:** OrderRequest with symbol, side, type, quantity\n**Output:** OrderResponse with order details or error\n\n**Workflow:** BinancePlaceOrderWorkflow\n**Activity:** PlaceOrder\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "exchange",
+                "binance",
+                "v1",
+                "order"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f3d7bcbe-fb2e-41d1-bf34-3c3c662f5d30",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test response status (may be 200 or 500 depending on API keys)",
+                  "pm.test(\"Response received\", function () {",
+                  "    pm.expect([200, 500]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "// Test response structure on success",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has order information\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('orderId');",
+                  "        pm.expect(jsonData).to.have.property('symbol');",
+                  "        pm.expect(jsonData).to.have.property('status');",
+                  "        pm.expect(jsonData).to.have.property('side');",
+                  "        pm.expect(jsonData).to.have.property('type');",
+                  "        pm.expect(jsonData).to.have.property('quantity');",
+                  "        pm.expect(jsonData).to.have.property('timestamp');",
+                  "    });",
+                  "}",
+                  "",
+                  "console.log('Place Order Response:', pm.response.json());"
+                ],
+                "_lastExecutionId": "ffed82a8-7a40-4077-9af4-608766394428"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Places a new order on Binance exchange using Temporal workflow.\n\n**Input:** OrderRequest with symbol, side, type, quantity\n**Output:** OrderResponse with order details or error\n\n**Workflow:** BinancePlaceOrderWorkflow\n**Activity:** PlaceOrder\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "8088",
+            "path": [
+              "api",
+              "exchange",
+              "binance",
+              "v1",
+              "order"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.37.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "3a319cc5-fe41-4f7f-8020-8cedb97f77e7",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8088",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "83",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.001\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "a5ab1e4c-fbe5-402b-b56e-4a02d420c2b0",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 30 Jun 2025 12:53:37 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "41"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              73,
+              110,
+              118,
+              97,
+              108,
+              105,
+              100,
+              32,
+              111,
+              114,
+              100,
+              101,
+              114,
+              32,
+              114,
+              101,
+              113,
+              117,
+              101,
+              115,
+              116,
+              32,
+              102,
+              111,
+              114,
+              109,
+              97,
+              116,
+              34,
+              125,
+              10
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1,
+          "responseSize": 41
+        },
+        "id": "bac9a2da-8608-40f5-b403-6ea2cf638d98",
+        "assertions": [
+          {
+            "assertion": "Response time is acceptable",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type is application/json",
+            "skipped": false
+          },
+          {
+            "assertion": "Response received",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Response received",
+              "message": "expected [ 200, 500 ] to include 400",
+              "stack": "AssertionError: expected [ 200, 500 ] to include 400\n   at Object.eval sandbox-script.js:1:3)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "70cb6ac0-b816-4155-966f-c108ab539778",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "35676471-c6e7-4628-ac18-1015b5971c5e"
+        },
+        "item": {
+          "id": "40fd8f91-f40b-4456-a2e7-cadcd3b48130",
+          "name": "Get Order Status",
+          "request": {
+            "description": {
+              "content": "Retrieves the status of a specific order by orderId.\n\n**Input:** orderId as path parameter, symbol as query parameter\n**Output:** OrderResponse with current order status or error\n\n**Workflow:** BinanceGetOrderStatusWorkflow\n**Activity:** GetOrderStatus\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "exchange",
+                "binance",
+                "v1",
+                "order",
+                "123456"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "60c1d4fe-d880-4886-a70b-7742835fb136",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test response status (may be 200 or 500 depending on API keys)",
+                  "pm.test(\"Response received\", function () {",
+                  "    pm.expect([200, 500]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "// Test response structure on success",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has order status\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('orderId');",
+                  "        pm.expect(jsonData).to.have.property('symbol');",
+                  "        pm.expect(jsonData).to.have.property('status');",
+                  "        pm.expect(jsonData).to.have.property('side');",
+                  "        pm.expect(jsonData).to.have.property('type');",
+                  "        pm.expect(jsonData).to.have.property('quantity');",
+                  "        pm.expect(jsonData).to.have.property('timestamp');",
+                  "    });",
+                  "}",
+                  "",
+                  "console.log('Order Status Response:', pm.response.json());"
+                ],
+                "_lastExecutionId": "749e9e8a-39d2-4772-a21b-e9985078adde"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Retrieves the status of a specific order by orderId.\n\n**Input:** orderId as path parameter, symbol as query parameter\n**Output:** OrderResponse with current order status or error\n\n**Workflow:** BinanceGetOrderStatusWorkflow\n**Activity:** GetOrderStatus\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "8088",
+            "path": [
+              "api",
+              "exchange",
+              "binance",
+              "v1",
+              "order",
+              "123456"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [
+              {
+                "key": "symbol",
+                "value": "BTCUSDT"
+              }
+            ],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.37.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "53719451-818a-4b46-8424-e3b3222b67b4",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8088",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "3eacd8bc-7a41-4637-9053-4d8f52ef268a",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 30 Jun 2025 12:53:37 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "139"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              111,
+              114,
+              100,
+              101,
+              114,
+              73,
+              100,
+              34,
+              58,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              44,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              66,
+              84,
+              67,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              70,
+              73,
+              76,
+              76,
+              69,
+              68,
+              34,
+              44,
+              34,
+              111,
+              114,
+              105,
+              103,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              48,
+              46,
+              48,
+              48,
+              49,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              34,
+              49,
+              48,
+              55,
+              56,
+              48,
+              48,
+              46,
+              48,
+              48,
+              34,
+              44,
+              34,
+              101,
+              120,
+              101,
+              99,
+              117,
+              116,
+              101,
+              100,
+              81,
+              116,
+              121,
+              34,
+              58,
+              34,
+              48,
+              46,
+              48,
+              48,
+              49,
+              34,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              34,
+              58,
+              34,
+              49,
+              55,
+              53,
+              49,
+              50,
+              56,
+              56,
+              48,
+              49,
+              55,
+              52,
+              48,
+              50,
+              34,
+              125,
+              10
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1,
+          "responseSize": 139
+        },
+        "id": "40fd8f91-f40b-4456-a2e7-cadcd3b48130",
+        "assertions": [
+          {
+            "assertion": "Response time is acceptable",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type is application/json",
+            "skipped": false
+          },
+          {
+            "assertion": "Response received",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has order status",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "Response has order status",
+              "message": "expected { orderId: 123456, …(6) } to have property 'side'",
+              "stack": "AssertionError: expected { orderId: 123456, …(6) } to have property 'side'\n   at Object.eval sandbox-script.js:2:4)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "270d7221-5bbc-4b11-b7dc-c1c8e20e976c",
+          "length": 5,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "382dfbfb-b363-4083-9ceb-05e8c89f0be3"
+        },
+        "item": {
+          "id": "143a2e30-538d-4f34-b938-02ca1f7d8f95",
+          "name": "Get Binance Price (Legacy)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "workflow",
+                "v1",
+                "BinancePrice"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "\"BTCUSDT\"",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f1eb4032-be62-4ae2-88af-1a39fed6885b",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test response status",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test response structure",
+                  "pm.test(\"Response has price information\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('symbol');",
+                  "    pm.expect(jsonData).to.have.property('price');",
+                  "    pm.expect(jsonData).to.have.property('timestamp');",
+                  "    pm.expect(jsonData).to.have.property('success');",
+                  "});",
+                  "",
+                  "console.log('Price Response:', pm.response.json());"
+                ],
+                "_lastExecutionId": "df0e3882-604f-48d3-82a3-7ce8f218c68b"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8088",
+            "path": [
+              "api",
+              "workflow",
+              "v1",
+              "BinancePrice"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.37.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "dd7f7e11-6708-4d47-87a7-22d61b08963a",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8088",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "9",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "\"BTCUSDT\"",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "9cd6e909-4e73-4afb-8e7a-56942c9c817d",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 30 Jun 2025 12:53:37 GMT"
+            },
+            {
+              "key": "Content-Length",
+              "value": "94"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              121,
+              109,
+              98,
+              111,
+              108,
+              34,
+              58,
+              34,
+              66,
+              84,
+              67,
+              85,
+              83,
+              68,
+              84,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              49,
+              48,
+              55,
+              56,
+              51,
+              56,
+              46,
+              52,
+              54,
+              44,
+              34,
+              116,
+              105,
+              109,
+              101,
+              115,
+              116,
+              97,
+              109,
+              112,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              53,
+              45,
+              48,
+              54,
+              45,
+              51,
+              48,
+              84,
+              49,
+              51,
+              58,
+              53,
+              51,
+              58,
+              51,
+              55,
+              43,
+              48,
+              49,
+              58,
+              48,
+              48,
+              34,
+              44,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              125,
+              10
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1,
+          "responseSize": 94
+        },
+        "id": "143a2e30-538d-4f34-b938-02ca1f7d8f95",
+        "assertions": [
+          {
+            "assertion": "Response time is acceptable",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type is application/json",
+            "skipped": false
+          },
+          {
+            "assertion": "Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has price information",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 1332
+    },
+    "failures": [
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Response received",
+          "message": "expected [ 200, 500 ] to include 400",
+          "stack": "AssertionError: expected [ 200, 500 ] to include 400\n   at Object.eval sandbox-script.js:1:3)",
+          "checksum": "6c389f59c4398c1d926603ab21f0c329",
+          "id": "6668549b-b2ad-4b6e-ab3b-1b5f71d9d847",
+          "timestamp": 1751288017387,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 3,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "bac9a2da-8608-40f5-b403-6ea2cf638d98",
+          "name": "Place Order",
+          "request": {
+            "description": {
+              "content": "Places a new order on Binance exchange using Temporal workflow.\n\n**Input:** OrderRequest with symbol, side, type, quantity\n**Output:** OrderResponse with order details or error\n\n**Workflow:** BinancePlaceOrderWorkflow\n**Activity:** PlaceOrder\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "exchange",
+                "binance",
+                "v1",
+                "order"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f3d7bcbe-fb2e-41d1-bf34-3c3c662f5d30",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test response status (may be 200 or 500 depending on API keys)",
+                  "pm.test(\"Response received\", function () {",
+                  "    pm.expect([200, 500]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "// Test response structure on success",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has order information\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('orderId');",
+                  "        pm.expect(jsonData).to.have.property('symbol');",
+                  "        pm.expect(jsonData).to.have.property('status');",
+                  "        pm.expect(jsonData).to.have.property('side');",
+                  "        pm.expect(jsonData).to.have.property('type');",
+                  "        pm.expect(jsonData).to.have.property('quantity');",
+                  "        pm.expect(jsonData).to.have.property('timestamp');",
+                  "    });",
+                  "}",
+                  "",
+                  "console.log('Place Order Response:', pm.response.json());"
+                ],
+                "_lastExecutionId": "ffed82a8-7a40-4077-9af4-608766394428"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "06cffa07-45e9-4afc-a0e4-9a6689fbd4eb",
+          "name": "Binance REST Endpoints",
+          "description": {
+            "content": "New REST endpoints for Binance operations. These endpoints use Temporal workflows internally for robust execution.",
+            "type": "text/plain"
+          },
+          "item": [
+            {
+              "id": "5d7aded4-9724-478f-84f6-8b9d6ba69b67",
+              "name": "Get Crypto Quotes",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "quotes"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d5821c20-2be6-489c-97c6-b2d05bd1166a",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "// Test response structure",
+                      "pm.test(\"Response has quotes array\", function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('quotes');",
+                      "    pm.expect(jsonData.quotes).to.be.an('array');",
+                      "    pm.expect(jsonData).to.have.property('timestamp');",
+                      "});",
+                      "",
+                      "// Test quotes content",
+                      "pm.test(\"Quotes contain required fields\", function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    if (jsonData.quotes && jsonData.quotes.length > 0) {",
+                      "        const quote = jsonData.quotes[0];",
+                      "        pm.expect(quote).to.have.property('symbol');",
+                      "        pm.expect(quote).to.have.property('lastPrice');",
+                      "        pm.expect(quote).to.have.property('askPrice');",
+                      "        pm.expect(quote).to.have.property('bidPrice');",
+                      "        pm.expect(quote).to.have.property('volume');",
+                      "        pm.expect(quote).to.have.property('timestamp');",
+                      "    }",
+                      "});",
+                      "",
+                      "console.log('Quotes Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "f4561cb5-7a93-4ff3-bead-0a886dcc8741"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "50c08f05-3ce0-4d8f-b317-6503b2479e1b",
+              "name": "Get All Orders",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "orders"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "11f30b67-1df8-4da1-80f3-dfdb1553d8a3",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "// Test response structure",
+                      "pm.test(\"Response has orders array\", function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('orders');",
+                      "    pm.expect(jsonData.orders).to.be.an('array');",
+                      "    pm.expect(jsonData).to.have.property('timestamp');",
+                      "});",
+                      "",
+                      "console.log('Orders Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "fbc83392-5f07-464b-94af-c47a73c9cc5a"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bac9a2da-8608-40f5-b403-6ea2cf638d98",
+              "name": "Place Order",
+              "request": {
+                "description": {
+                  "content": "Places a new order on Binance exchange using Temporal workflow.\n\n**Input:** OrderRequest with symbol, side, type, quantity\n**Output:** OrderResponse with order details or error\n\n**Workflow:** BinancePlaceOrderWorkflow\n**Activity:** PlaceOrder\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "order"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.001\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "f3d7bcbe-fb2e-41d1-bf34-3c3c662f5d30",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status (may be 200 or 500 depending on API keys)",
+                      "pm.test(\"Response received\", function () {",
+                      "    pm.expect([200, 500]).to.include(pm.response.code);",
+                      "});",
+                      "",
+                      "// Test response structure on success",
+                      "if (pm.response.code === 200) {",
+                      "    pm.test(\"Response has order information\", function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData).to.have.property('orderId');",
+                      "        pm.expect(jsonData).to.have.property('symbol');",
+                      "        pm.expect(jsonData).to.have.property('status');",
+                      "        pm.expect(jsonData).to.have.property('side');",
+                      "        pm.expect(jsonData).to.have.property('type');",
+                      "        pm.expect(jsonData).to.have.property('quantity');",
+                      "        pm.expect(jsonData).to.have.property('timestamp');",
+                      "    });",
+                      "}",
+                      "",
+                      "console.log('Place Order Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "ffed82a8-7a40-4077-9af4-608766394428"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "40fd8f91-f40b-4456-a2e7-cadcd3b48130",
+              "name": "Get Order Status",
+              "request": {
+                "description": {
+                  "content": "Retrieves the status of a specific order by orderId.\n\n**Input:** orderId as path parameter, symbol as query parameter\n**Output:** OrderResponse with current order status or error\n\n**Workflow:** BinanceGetOrderStatusWorkflow\n**Activity:** GetOrderStatus\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "order",
+                    "123456"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "symbol",
+                      "value": "BTCUSDT"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "60c1d4fe-d880-4886-a70b-7742835fb136",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status (may be 200 or 500 depending on API keys)",
+                      "pm.test(\"Response received\", function () {",
+                      "    pm.expect([200, 500]).to.include(pm.response.code);",
+                      "});",
+                      "",
+                      "// Test response structure on success",
+                      "if (pm.response.code === 200) {",
+                      "    pm.test(\"Response has order status\", function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData).to.have.property('orderId');",
+                      "        pm.expect(jsonData).to.have.property('symbol');",
+                      "        pm.expect(jsonData).to.have.property('status');",
+                      "        pm.expect(jsonData).to.have.property('side');",
+                      "        pm.expect(jsonData).to.have.property('type');",
+                      "        pm.expect(jsonData).to.have.property('quantity');",
+                      "        pm.expect(jsonData).to.have.property('timestamp');",
+                      "    });",
+                      "}",
+                      "",
+                      "console.log('Order Status Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "749e9e8a-39d2-4772-a21b-e9985078adde"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "a0d8c4d9-2e15-470a-842f-1cd1a60c2164",
+          "length": 5,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "d4a42848-46e6-4d23-a417-9bad7a19e561",
+          "scriptId": "f3d7bcbe-fb2e-41d1-bf34-3c3c662f5d30",
+          "execution": "ffed82a8-7a40-4077-9af4-608766394428"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "Response has order status",
+          "message": "expected { orderId: 123456, …(6) } to have property 'side'",
+          "stack": "AssertionError: expected { orderId: 123456, …(6) } to have property 'side'\n   at Object.eval sandbox-script.js:2:4)",
+          "checksum": "91860fd5461701d20d552fe746f9c7cd",
+          "id": "e7fad297-06b4-459b-9bb4-ee9b0dc9e139",
+          "timestamp": 1751288017407,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 4,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "40fd8f91-f40b-4456-a2e7-cadcd3b48130",
+          "name": "Get Order Status",
+          "request": {
+            "description": {
+              "content": "Retrieves the status of a specific order by orderId.\n\n**Input:** orderId as path parameter, symbol as query parameter\n**Output:** OrderResponse with current order status or error\n\n**Workflow:** BinanceGetOrderStatusWorkflow\n**Activity:** GetOrderStatus\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "exchange",
+                "binance",
+                "v1",
+                "order",
+                "123456"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "symbol",
+                  "value": "BTCUSDT"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "60c1d4fe-d880-4886-a70b-7742835fb136",
+                "type": "text/javascript",
+                "exec": [
+                  "// Test response status (may be 200 or 500 depending on API keys)",
+                  "pm.test(\"Response received\", function () {",
+                  "    pm.expect([200, 500]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "// Test response structure on success",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has order status\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('orderId');",
+                  "        pm.expect(jsonData).to.have.property('symbol');",
+                  "        pm.expect(jsonData).to.have.property('status');",
+                  "        pm.expect(jsonData).to.have.property('side');",
+                  "        pm.expect(jsonData).to.have.property('type');",
+                  "        pm.expect(jsonData).to.have.property('quantity');",
+                  "        pm.expect(jsonData).to.have.property('timestamp');",
+                  "    });",
+                  "}",
+                  "",
+                  "console.log('Order Status Response:', pm.response.json());"
+                ],
+                "_lastExecutionId": "749e9e8a-39d2-4772-a21b-e9985078adde"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "06cffa07-45e9-4afc-a0e4-9a6689fbd4eb",
+          "name": "Binance REST Endpoints",
+          "description": {
+            "content": "New REST endpoints for Binance operations. These endpoints use Temporal workflows internally for robust execution.",
+            "type": "text/plain"
+          },
+          "item": [
+            {
+              "id": "5d7aded4-9724-478f-84f6-8b9d6ba69b67",
+              "name": "Get Crypto Quotes",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "quotes"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "d5821c20-2be6-489c-97c6-b2d05bd1166a",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "// Test response structure",
+                      "pm.test(\"Response has quotes array\", function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('quotes');",
+                      "    pm.expect(jsonData.quotes).to.be.an('array');",
+                      "    pm.expect(jsonData).to.have.property('timestamp');",
+                      "});",
+                      "",
+                      "// Test quotes content",
+                      "pm.test(\"Quotes contain required fields\", function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    if (jsonData.quotes && jsonData.quotes.length > 0) {",
+                      "        const quote = jsonData.quotes[0];",
+                      "        pm.expect(quote).to.have.property('symbol');",
+                      "        pm.expect(quote).to.have.property('lastPrice');",
+                      "        pm.expect(quote).to.have.property('askPrice');",
+                      "        pm.expect(quote).to.have.property('bidPrice');",
+                      "        pm.expect(quote).to.have.property('volume');",
+                      "        pm.expect(quote).to.have.property('timestamp');",
+                      "    }",
+                      "});",
+                      "",
+                      "console.log('Quotes Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "f4561cb5-7a93-4ff3-bead-0a886dcc8741"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "50c08f05-3ce0-4d8f-b317-6503b2479e1b",
+              "name": "Get All Orders",
+              "request": {
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "orders"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "11f30b67-1df8-4da1-80f3-dfdb1553d8a3",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "// Test response structure",
+                      "pm.test(\"Response has orders array\", function () {",
+                      "    const jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('orders');",
+                      "    pm.expect(jsonData.orders).to.be.an('array');",
+                      "    pm.expect(jsonData).to.have.property('timestamp');",
+                      "});",
+                      "",
+                      "console.log('Orders Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "fbc83392-5f07-464b-94af-c47a73c9cc5a"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bac9a2da-8608-40f5-b403-6ea2cf638d98",
+              "name": "Place Order",
+              "request": {
+                "description": {
+                  "content": "Places a new order on Binance exchange using Temporal workflow.\n\n**Input:** OrderRequest with symbol, side, type, quantity\n**Output:** OrderResponse with order details or error\n\n**Workflow:** BinancePlaceOrderWorkflow\n**Activity:** PlaceOrder\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "order"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"symbol\": \"BTCUSDT\",\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.001\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "f3d7bcbe-fb2e-41d1-bf34-3c3c662f5d30",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status (may be 200 or 500 depending on API keys)",
+                      "pm.test(\"Response received\", function () {",
+                      "    pm.expect([200, 500]).to.include(pm.response.code);",
+                      "});",
+                      "",
+                      "// Test response structure on success",
+                      "if (pm.response.code === 200) {",
+                      "    pm.test(\"Response has order information\", function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData).to.have.property('orderId');",
+                      "        pm.expect(jsonData).to.have.property('symbol');",
+                      "        pm.expect(jsonData).to.have.property('status');",
+                      "        pm.expect(jsonData).to.have.property('side');",
+                      "        pm.expect(jsonData).to.have.property('type');",
+                      "        pm.expect(jsonData).to.have.property('quantity');",
+                      "        pm.expect(jsonData).to.have.property('timestamp');",
+                      "    });",
+                      "}",
+                      "",
+                      "console.log('Place Order Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "ffed82a8-7a40-4077-9af4-608766394428"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "40fd8f91-f40b-4456-a2e7-cadcd3b48130",
+              "name": "Get Order Status",
+              "request": {
+                "description": {
+                  "content": "Retrieves the status of a specific order by orderId.\n\n**Input:** orderId as path parameter, symbol as query parameter\n**Output:** OrderResponse with current order status or error\n\n**Workflow:** BinanceGetOrderStatusWorkflow\n**Activity:** GetOrderStatus\n\n**Note:** Requires valid Binance API keys to work. Will timeout without proper credentials.",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "api",
+                    "exchange",
+                    "binance",
+                    "v1",
+                    "order",
+                    "123456"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "symbol",
+                      "value": "BTCUSDT"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "60c1d4fe-d880-4886-a70b-7742835fb136",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Test response status (may be 200 or 500 depending on API keys)",
+                      "pm.test(\"Response received\", function () {",
+                      "    pm.expect([200, 500]).to.include(pm.response.code);",
+                      "});",
+                      "",
+                      "// Test response structure on success",
+                      "if (pm.response.code === 200) {",
+                      "    pm.test(\"Response has order status\", function () {",
+                      "        const jsonData = pm.response.json();",
+                      "        pm.expect(jsonData).to.have.property('orderId');",
+                      "        pm.expect(jsonData).to.have.property('symbol');",
+                      "        pm.expect(jsonData).to.have.property('status');",
+                      "        pm.expect(jsonData).to.have.property('side');",
+                      "        pm.expect(jsonData).to.have.property('type');",
+                      "        pm.expect(jsonData).to.have.property('quantity');",
+                      "        pm.expect(jsonData).to.have.property('timestamp');",
+                      "    });",
+                      "}",
+                      "",
+                      "console.log('Order Status Response:', pm.response.json());"
+                    ],
+                    "_lastExecutionId": "749e9e8a-39d2-4772-a21b-e9985078adde"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "70cb6ac0-b816-4155-966f-c108ab539778",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "35676471-c6e7-4628-ac18-1015b5971c5e",
+          "scriptId": "60c1d4fe-d880-4886-a70b-7742835fb136",
+          "execution": "749e9e8a-39d2-4772-a21b-e9985078adde"
+        }
+      }
+    ],
+    "error": null
+  }
+}

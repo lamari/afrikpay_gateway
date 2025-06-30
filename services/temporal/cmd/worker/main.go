@@ -43,12 +43,16 @@ func main() {
 	w.RegisterWorkflow(workflows.BinancePriceWorkflow)
 	w.RegisterWorkflow(workflows.BinanceQuotesWorkflow)
 	w.RegisterWorkflow(workflows.BinanceOrdersWorkflow)
+	w.RegisterWorkflow(workflows.BinancePlaceOrderWorkflow)
+	w.RegisterWorkflow(workflows.BinanceGetOrderStatusWorkflow)
 
 	// Register activities using singleton factories
 	binanceActivities := activities.GetBinanceActivitiesFromFactory()
 	w.RegisterActivity(binanceActivities.GetPrice)
 	w.RegisterActivity(binanceActivities.GetQuotes)
 	w.RegisterActivity(binanceActivities.GetAllOrders)
+	w.RegisterActivity(binanceActivities.PlaceOrder)
+	w.RegisterActivity(binanceActivities.GetOrderStatus)
 
 	log.Println("[Temporal] Worker started on task queue: afrikpay")
 	err = w.Run(worker.InterruptCh())

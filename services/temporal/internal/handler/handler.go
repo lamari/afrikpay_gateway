@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/afrikpay/gateway/internal/models"
 	"github.com/afrikpay/gateway/internal/workflows"
 	"github.com/labstack/echo/v4"
 	goTemporalClient "go.temporal.io/sdk/client"
@@ -161,4 +162,88 @@ func BinanceOrdersHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, ordersResponse)
+}
+
+// BinancePlaceOrderHandler handles POST requests for placing orders
+func BinancePlaceOrderHandler(c echo.Context) error {
+	// Parse request body
+	var orderRequest models.OrderRequest
+	if err := c.Bind(&orderRequest); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid order request: "+err.Error())
+	}
+
+	// Validate the order request
+	if err := orderRequest.Validate(); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid order: "+err.Error())
+	}
+
+	workflowOptions := goTemporalClient.StartWorkflowOptions{
+		TaskQueue: "afrikpay",
+	}
+
+	// Execute BinancePlaceOrder workflow
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	
+	wf, err := temporalClient.ExecuteWorkflow(
+		ctx,
+		workflowOptions,
+		workflows.BinancePlaceOrderWorkflow,
+		&orderRequest,
+	)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+	}
+
+	// Wait for result with timeout
+	var orderResponse models.OrderResponse
+	err = wf.Get(ctx, &orderResponse)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+	}
+
+	return c.JSON(http.StatusOK, orderResponse)
+}
+
+// BinanceGetOrderStatusHandler handles GET requests for order status
+func BinanceGetOrderStatusHandler(c echo.Context) error {
+	// Get path parameters
+	orderID := c.Param("orderId")
+	if orderID == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Order ID is required")
+	}
+
+	// Get symbol from query parameter
+	symbol := c.QueryParam("symbol")
+	if symbol == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Symbol is required as query parameter")
+	}
+
+	workflowOptions := goTemporalClient.StartWorkflowOptions{
+		TaskQueue: "afrikpay",
+	}
+
+	// Execute BinanceGetOrderStatus workflow
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	
+	wf, err := temporalClient.ExecuteWorkflow(
+		ctx,
+		workflowOptions,
+		workflows.BinanceGetOrderStatusWorkflow,
+		symbol,
+		orderID,
+	)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+	}
+
+	// Wait for result with timeout
+	var orderResponse models.OrderResponse
+	err = wf.Get(ctx, &orderResponse)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+	}
+
+	return c.JSON(http.StatusOK, orderResponse)
 }

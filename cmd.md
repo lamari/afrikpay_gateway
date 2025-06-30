@@ -27,12 +27,21 @@ Tu es maintenant l'architecte principal du projet Afrikpay Gateway. Ta mission e
 DÉMARRE MAINTENANT !
 
 
-je veux que tu crée les endpoints dans api, de temporal et les workflows associé :
-- "GET /api/exchange/binance/v1/orders (get all orders)"- "GET /api/exchange/binance/v1/quotes (get all crypto quotes)"
 
-modifie l'api le worker et ajoute les workflows correspandante, normalement le activities sont deja crée, tu peux les utiliser, si tu ne tourve pas d'activité il faut crée dabord la fonction dans le clients et ensuite tu crée l'activité 
+
+je veux que tu crée les endpoints dans api, de temporal et les workflows associé :
+- "POST /api/exchange/binance/v1/order (make an order)"
+- "GET /api/exchange/binance/v1/order/{idorder} (get an order status)"
+
+modifie l'api le worker et ajoute les workflows correspandante, normalement le activities sont deja crée, tu peux les utiliser, si tu ne tourve pas d'activité il faut crée dabord la fonction dans le clients et ensuite tu crée l'activité
 
 ensuite redemarre les service et fait un test E2E et regarde si tout est ok
 
+ensuite il faut modifier la collection postamn/temporal_binance_workflows et ajouter les nouveau endpoint et tester avec newman
+
+
 si tu as des problemes a seconnecter à l'api de biance consulte la collextion postman/Afrikpay Gateway - API Clients E2E Complete .postman_collection et regarde dans les pre-request et test elle peuvent contenir de la logique qu'on doit suivre pour appeler les differents apis, utilise cette collection pour avoir la bonne methode a suivre
+
+il ne faut pas oublier que le make order a besoin d'envoyer une signayure dans le header tu peux touver la logique dans la collection postman
+
 
