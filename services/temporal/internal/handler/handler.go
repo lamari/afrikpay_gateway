@@ -18,10 +18,7 @@ func WorkflowHandler(c echo.Context) error {
 	workflowOptions := goTemporalClient.StartWorkflowOptions{
 		TaskQueue: "afrikpay",
 	}
-	var (
-		result interface{}
-		err    error
-	)
+	var result interface{}
 
 	switch workflowKey {
 	// Nouveaux workflows Binance
@@ -55,18 +52,113 @@ func WorkflowHandler(c echo.Context) error {
 
 		result = priceResponse
 
+	case "BinanceQuotes_v1":
+		// Execute BinanceQuotes workflow (no input required)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		
+		wf, err := temporalClient.ExecuteWorkflow(
+			ctx,
+			workflowOptions,
+			workflows.BinanceQuotesWorkflow,
+		)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+		}
+
+		// Wait for result with timeout
+		var quotesResponse interface{}
+		err = wf.Get(ctx, &quotesResponse)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+		}
+
+		result = quotesResponse
+
+	case "BinanceOrders_v1":
+		// Execute BinanceOrders workflow (no input required)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		
+		wf, err := temporalClient.ExecuteWorkflow(
+			ctx,
+			workflowOptions,
+			workflows.BinanceOrdersWorkflow,
+		)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+		}
+
+		// Wait for result with timeout
+		var ordersResponse interface{}
+		err = wf.Get(ctx, &ordersResponse)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+		}
+
+		result = ordersResponse
+
 	default:
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "workflow not found"})
 	}
-	if err != nil {
-		// If the error is due to input binding (invalid JSON), return HTTP 400
-		if he, ok := err.(*echo.HTTPError); ok {
-			return he
-		}
-		if err == echo.ErrUnsupportedMediaType || err == echo.ErrBadRequest || err.Error() == "code=400, message=Unmarshal type error" {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		}
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
+
 	return c.JSON(http.StatusOK, result)
+}
+
+// BinanceQuotesHandler handles GET requests for Binance quotes
+func BinanceQuotesHandler(c echo.Context) error {
+	workflowOptions := goTemporalClient.StartWorkflowOptions{
+		TaskQueue: "afrikpay",
+	}
+
+	// Execute BinanceQuotes workflow
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	
+	wf, err := temporalClient.ExecuteWorkflow(
+		ctx,
+		workflowOptions,
+		workflows.BinanceQuotesWorkflow,
+	)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+	}
+
+	// Wait for result with timeout
+	var quotesResponse interface{}
+	err = wf.Get(ctx, &quotesResponse)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+	}
+
+	return c.JSON(http.StatusOK, quotesResponse)
+}
+
+// BinanceOrdersHandler handles GET requests for Binance orders
+func BinanceOrdersHandler(c echo.Context) error {
+	workflowOptions := goTemporalClient.StartWorkflowOptions{
+		TaskQueue: "afrikpay",
+	}
+
+	// Execute BinanceOrders workflow
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	
+	wf, err := temporalClient.ExecuteWorkflow(
+		ctx,
+		workflowOptions,
+		workflows.BinanceOrdersWorkflow,
+	)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+	}
+
+	// Wait for result with timeout
+	var ordersResponse interface{}
+	err = wf.Get(ctx, &ordersResponse)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+	}
+
+	return c.JSON(http.StatusOK, ordersResponse)
 }

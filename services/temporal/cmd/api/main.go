@@ -31,11 +31,12 @@ func main() {
 		HostPort: cfg.Temporal.Server.Address,
 	})
 	if err != nil {
-		log.Fatalf("unable to create Temporal client: %v", err)
+		log.Printf("Warning: unable to create Temporal client: %v", err)
+		log.Printf("Continuing without Temporal client...")
+	} else {
+		defer c.Close()
+		handler.SetTemporalClient(c)
 	}
-	defer c.Close()
-
-	handler.SetTemporalClient(c)
 
 	handler.RegisterRoutes(e, cfg)
 

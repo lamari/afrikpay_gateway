@@ -294,6 +294,12 @@ type QuotesResponse struct {
 	Timestamp time.Time       `json:"timestamp"`
 }
 
+// OrdersResponse represents a response containing multiple orders
+type OrdersResponse struct {
+	Orders    []OrderResponse `json:"orders"`
+	Timestamp time.Time       `json:"timestamp"`
+}
+
 // OrderStatusResponse represents the response for order status queries
 type OrderStatusResponse struct {
 	OrderID       string    `json:"orderId"`

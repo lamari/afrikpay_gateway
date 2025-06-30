@@ -11,6 +11,10 @@ import (
 func RegisterRoutes(e *echo.Echo, cfg *config.Config) {
 	// Endpoint unique pour tous les workflows
 	e.POST("/api/workflow/:version/:nameworkflow", WorkflowHandler)
+	
+	// Binance-specific endpoints using GET method
+	e.GET("/api/exchange/binance/v1/quotes", BinanceQuotesHandler)
+	e.GET("/api/exchange/binance/v1/orders", BinanceOrdersHandler)
 }
 
 type TemporalClientIface interface {

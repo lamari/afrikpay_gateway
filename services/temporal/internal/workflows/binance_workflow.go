@@ -2,6 +2,7 @@ package workflows
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/afrikpay/gateway/internal/activities"
 	"github.com/afrikpay/gateway/internal/models"
@@ -43,6 +44,52 @@ func BinancePriceWorkflow(ctx workflow.Context, symbol string) (*models.PriceRes
 		"success", priceResponse.Success)
 
 	return priceResponse, nil
+}
+
+// BinanceQuotesWorkflow retrieves multiple quotes from Binance
+func BinanceQuotesWorkflow(ctx workflow.Context) (*models.QuotesResponse, error) {
+	logger := workflow.GetLogger(ctx)
+	logger.Info("BinanceQuotesWorkflow started")
+
+	// Configure activity options
+	activityOptions := workflow.ActivityOptions{
+		StartToCloseTimeout: 30 * time.Second,
+	}
+	ctx = workflow.WithActivityOptions(ctx, activityOptions)
+
+	// Execute GetQuotes activity
+	var quotesResponse models.QuotesResponse
+	err := workflow.ExecuteActivity(ctx, "GetQuotes").Get(ctx, &quotesResponse)
+	if err != nil {
+		logger.Error("Failed to get Binance quotes", "error", err)
+		return nil, err
+	}
+
+	logger.Info("BinanceQuotesWorkflow completed successfully", "quotes_count", len(quotesResponse.Quotes))
+	return &quotesResponse, nil
+}
+
+// BinanceOrdersWorkflow retrieves all orders from Binance
+func BinanceOrdersWorkflow(ctx workflow.Context) (*models.OrdersResponse, error) {
+	logger := workflow.GetLogger(ctx)
+	logger.Info("BinanceOrdersWorkflow started")
+
+	// Configure activity options
+	activityOptions := workflow.ActivityOptions{
+		StartToCloseTimeout: 30 * time.Second,
+	}
+	ctx = workflow.WithActivityOptions(ctx, activityOptions)
+
+	// Execute GetAllOrders activity
+	var ordersResponse models.OrdersResponse
+	err := workflow.ExecuteActivity(ctx, "GetAllOrders").Get(ctx, &ordersResponse)
+	if err != nil {
+		logger.Error("Failed to get Binance orders", "error", err)
+		return nil, err
+	}
+
+	logger.Info("BinanceOrdersWorkflow completed successfully", "orders_count", len(ordersResponse.Orders))
+	return &ordersResponse, nil
 }
 
 // BinancePriceWorkflowWithInput is a wrapper that accepts structured input

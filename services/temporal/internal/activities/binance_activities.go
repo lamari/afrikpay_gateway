@@ -44,6 +44,11 @@ func (a *BinanceActivities) GetQuote(ctx context.Context, symbol string) (*model
 	return a.client.GetQuote(ctx, symbol)
 }
 
+// GetAllOrders gets all open orders for the account
+func (a *BinanceActivities) GetAllOrders(ctx context.Context) (*models.OrdersResponse, error) {
+	return a.client.GetAllOrders(ctx)
+}
+
 // HealthCheck performs a health check
 func (a *BinanceActivities) HealthCheck(ctx context.Context) error {
 	return a.client.HealthCheck(ctx)
