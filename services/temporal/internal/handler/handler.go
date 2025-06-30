@@ -33,7 +33,7 @@ func WorkflowHandler(c echo.Context) error {
 		// Execute workflow with timeout
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
-		
+
 		wf, err := temporalClient.ExecuteWorkflow(
 			ctx,
 			workflowOptions,
@@ -57,7 +57,7 @@ func WorkflowHandler(c echo.Context) error {
 		// Execute BinanceQuotes workflow (no input required)
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
-		
+
 		wf, err := temporalClient.ExecuteWorkflow(
 			ctx,
 			workflowOptions,
@@ -80,7 +80,7 @@ func WorkflowHandler(c echo.Context) error {
 		// Execute BinanceOrders workflow (no input required)
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
-		
+
 		wf, err := temporalClient.ExecuteWorkflow(
 			ctx,
 			workflowOptions,
@@ -99,6 +99,36 @@ func WorkflowHandler(c echo.Context) error {
 
 		result = ordersResponse
 
+	case "MTNPayment_v1":
+		// Parse input: paymentRequest from request body
+		var paymentRequest models.PaymentRequest
+		if err := c.Bind(&paymentRequest); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "Invalid input: "+err.Error())
+		}
+
+		// Execute MTNPayment workflow
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		wf, err := temporalClient.ExecuteWorkflow(
+			ctx,
+			workflowOptions,
+			workflows.MTNPaymentWorkflow,
+			&paymentRequest,
+		)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+		}
+
+		// Wait for result
+		var paymentResponse interface{}
+		err = wf.Get(ctx, &paymentResponse)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+		}
+
+		result = paymentResponse
+
 	default:
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "workflow not found"})
 	}
@@ -115,7 +145,7 @@ func BinanceQuotesHandler(c echo.Context) error {
 	// Execute BinanceQuotes workflow
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	wf, err := temporalClient.ExecuteWorkflow(
 		ctx,
 		workflowOptions,
@@ -144,7 +174,7 @@ func BinanceOrdersHandler(c echo.Context) error {
 	// Execute BinanceOrders workflow
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	wf, err := temporalClient.ExecuteWorkflow(
 		ctx,
 		workflowOptions,
@@ -184,7 +214,7 @@ func BinancePlaceOrderHandler(c echo.Context) error {
 	// Execute BinancePlaceOrder workflow
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	wf, err := temporalClient.ExecuteWorkflow(
 		ctx,
 		workflowOptions,
@@ -226,7 +256,7 @@ func BinanceGetOrderStatusHandler(c echo.Context) error {
 	// Execute BinanceGetOrderStatus workflow
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	wf, err := temporalClient.ExecuteWorkflow(
 		ctx,
 		workflowOptions,
@@ -246,4 +276,39 @@ func BinanceGetOrderStatusHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, orderResponse)
+}
+
+// MTNPaymentHandler handles POST requests for initiating MTN payments
+func MTNPaymentHandler(c echo.Context) error {
+	// Parse request body
+	var paymentRequest models.PaymentRequest
+	if err := c.Bind(&paymentRequest); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid payment request: "+err.Error())
+	}
+
+	workflowOptions := goTemporalClient.StartWorkflowOptions{
+		TaskQueue: "afrikpay",
+	}
+
+	// Execute MTNPaymentWorkflow with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	wf, err := temporalClient.ExecuteWorkflow(
+		ctx,
+		workflowOptions,
+		workflows.MTNPaymentWorkflow,
+		&paymentRequest,
+	)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start workflow: "+err.Error())
+	}
+
+	// Wait for workflow result
+	var paymentResponse models.PaymentResponse
+	if err := wf.Get(ctx, &paymentResponse); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Workflow failed: "+err.Error())
+	}
+
+	return c.JSON(http.StatusOK, paymentResponse)
 }

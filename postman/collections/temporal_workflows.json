@@ -262,6 +262,53 @@
 			"description": "New REST endpoints for Binance operations. These endpoints use Temporal workflows internally for robust execution."
 		},
 		{
+			"name": "MTN Payment Endpoints",
+			"item": [
+				{
+					"name": "MTN Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test response status",
+									"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has payment fields\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('referenceId');",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"});",
+									"",
+									"console.log('MTN Payment Response:', pm.response.json());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json", "type": "text" },
+							{ "key": "Accept", "value": "application/json", "type": "text" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\\n  \\\"amount\\\": 1000,\\n  \\\"currency\\\": \\\"XAF\\\",\\n  \\\"externalId\\\": \\\"ext123\\\",\\n  \\\"phoneNumber\\\": \\\"+237670000000\\\"\\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/api/payment/mtn/v1",
+							"host": ["{{base_url}}"],
+							"path": ["api","payment","mtn","v1"]
+						}
+					}
+				}
+			],
+			"description": "Endpoint to initiate an MTN Mobile Money payment via Temporal MTN workflow."
+		},
+		{
 			"name": "Legacy Workflow Endpoints",
 			"item": [
 				{

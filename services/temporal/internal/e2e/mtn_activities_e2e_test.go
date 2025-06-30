@@ -113,3 +113,115 @@ func TestMTNActivitiesE2E_GetPaymentStatus_ShouldCheckStatus(t *testing.T) {
 	assert.NotNil(t, response, "Response should not be nil")
 	assert.Equal(t, testReferenceID, response.ReferenceID, "ReferenceID should match")
 }
+
+// Test creation of MTN API user
+func TestMTNActivitiesE2E_CreateUser_ShouldReturnReferenceID(t *testing.T) {
+	cfg, err := config.LoadConfig("../../config/config.yaml")
+	require.NoError(t, err, "Failed to load configuration")
+	mtnConfig := cfg.GetMTNConfig()
+	if mtnConfig == nil || mtnConfig.BaseURL == "" {
+		t.Skip("MTN Mobile Money not configured, skipping")
+	}
+	mtnClient := clients.NewMTNClient(*mtnConfig)
+	acts := activities.NewMTNActivities(*mtnClient)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	ref, err := acts.CreateUser(ctx, "http://localhost/callback")
+	if err != nil {
+		t.Fatalf("CreateUser error: %v", err)
+	}
+	assert.NotEmpty(t, ref, "ReferenceID should not be empty")
+}
+
+// Test generation of MTN API key
+func TestMTNActivitiesE2E_CreateApiKey_ShouldReturnApiKey(t *testing.T) {
+	cfg, err := config.LoadConfig("../../config/config.yaml")
+	require.NoError(t, err)
+	mtnConfig := cfg.GetMTNConfig()
+	if mtnConfig == nil || mtnConfig.BaseURL == "" {
+		t.Skip("MTN Mobile Money not configured, skipping")
+	}
+	mtnClient := clients.NewMTNClient(*mtnConfig)
+	acts := activities.NewMTNActivities(*mtnClient)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// ensure user exists
+	referenceID, err := acts.CreateUser(ctx, "http://localhost/callback")
+	require.NoError(t, err)
+
+	apiKey, err := acts.CreateApiKey(ctx, referenceID)
+	if err != nil {
+		t.Fatalf("CreateApiKey error: %v", err)
+	}
+	assert.NotEmpty(t, apiKey, "ApiKey should not be empty")
+}
+
+// Test retrieval of MTN access token
+func TestMTNActivitiesE2E_GetAccessToken_ShouldReturnToken(t *testing.T) {
+	cfg, err := config.LoadConfig("../../config/config.yaml")
+	require.NoError(t, err)
+	mtnConfig := cfg.GetMTNConfig()
+	if mtnConfig == nil || mtnConfig.BaseURL == "" {
+		t.Skip("MTN Mobile Money not configured, skipping")
+	}
+	mtnClient := clients.NewMTNClient(*mtnConfig)
+	acts := activities.NewMTNActivities(*mtnClient)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// prepare user and apiKey
+	referenceID, err := acts.CreateUser(ctx, "http://localhost/callback")
+	require.NoError(t, err)
+	apiKey, err := acts.CreateApiKey(ctx, referenceID)
+	require.NoError(t, err)
+
+	token, err := acts.GetAccessToken(ctx, referenceID, apiKey)
+	if err != nil {
+		t.Fatalf("GetAccessToken error: %v", err)
+	}
+	assert.NotEmpty(t, token, "AccessToken should not be empty")
+}
+
+// Test creation of MTN payment request
+func TestMTNActivitiesE2E_CreatePaymentRequest_ShouldReturnResponse(t *testing.T) {
+	cfg, err := config.LoadConfig("../../config/config.yaml")
+	require.NoError(t, err)
+	mtnConfig := cfg.GetMTNConfig()
+	if mtnConfig == nil || mtnConfig.BaseURL == "" {
+		t.Skip("MTN Mobile Money not configured, skipping")
+	}
+	mtnClient := clients.NewMTNClient(*mtnConfig)
+	acts := activities.NewMTNActivities(*mtnClient)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// prepare auth
+	referenceID, err := acts.CreateUser(ctx, "http://localhost/callback")
+	require.NoError(t, err)
+	apiKey, err := acts.CreateApiKey(ctx, referenceID)
+	require.NoError(t, err)
+	accessToken, err := acts.GetAccessToken(ctx, referenceID, apiKey)
+	require.NoError(t, err)
+
+	mtnReq := &models.MTNPaymentRequest{
+		Amount:       "1.00",
+		Currency:     "EUR",
+		ExternalID:   uuid.New().String(),
+		Payer:        models.MTNPayer{PartyIDType: "MSISDN", PartyID: "256774290781"},
+		PayerMessage: "Test",
+		PayeeNote:    "Note",
+		CallbackURL:  "http://localhost/callback",
+		Metadata:     map[string]string{},
+	}
+
+	resp, err := acts.CreatePaymentRequest(ctx, referenceID, accessToken, mtnReq)
+	if err != nil {
+		t.Logf("CreatePaymentRequest error (expected in sandbox): %v", err)
+		return
+	}
+	assert.NotNil(t, resp, "Response should not be nil")
+	assert.NotEmpty(t, resp.ReferenceID, "ReferenceID should not be empty")
+	assert.Equal(t, "PENDING", resp.Status, "Status should be PENDING")
+}

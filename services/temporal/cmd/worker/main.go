@@ -38,6 +38,7 @@ func main() {
 	}
 	defer c.Close()
 
+	// Create worker with the task queue "afrikpay"
 	w := worker.New(c, "afrikpay", worker.Options{})
 
 	// Register workflows
@@ -46,14 +47,34 @@ func main() {
 	w.RegisterWorkflow(workflows.BinanceOrdersWorkflow)
 	w.RegisterWorkflow(workflows.BinancePlaceOrderWorkflow)
 	w.RegisterWorkflow(workflows.BinanceGetOrderStatusWorkflow)
+	w.RegisterWorkflow(workflows.MTNPaymentWorkflow)
 
-	// Register activities using singleton factories
+	// Register Binance activities using singleton factory
 	binanceActivities := activities.GetBinanceActivitiesFromFactory()
 	w.RegisterActivityWithOptions(binanceActivities.GetPrice, activity.RegisterOptions{Name: "GetPrice"})
 	w.RegisterActivityWithOptions(binanceActivities.GetQuotes, activity.RegisterOptions{Name: "GetQuotes"})
 	w.RegisterActivityWithOptions(binanceActivities.GetAllOrders, activity.RegisterOptions{Name: "GetAllOrders"})
 	w.RegisterActivityWithOptions(binanceActivities.PlaceOrder, activity.RegisterOptions{Name: "PlaceOrder"})
 	w.RegisterActivityWithOptions(binanceActivities.GetOrderStatus, activity.RegisterOptions{Name: "GetOrderStatus"})
+
+	// Register MTN activities using singleton factory
+	mtnActivities := activities.GetMTNActivitiesFromFactory()
+	w.RegisterActivityWithOptions(mtnActivities.InitiatePayment, activity.RegisterOptions{Name: "InitiatePayment"})
+	w.RegisterActivityWithOptions(mtnActivities.GetPaymentStatus, activity.RegisterOptions{Name: "GetPaymentStatus"})
+	w.RegisterActivityWithOptions(mtnActivities.HealthCheck, activity.RegisterOptions{Name: "HealthCheck"})
+	w.RegisterActivityWithOptions(mtnActivities.CreateUser, activity.RegisterOptions{Name: "CreateUser"})
+	w.RegisterActivityWithOptions(mtnActivities.CreateApiKey, activity.RegisterOptions{Name: "CreateApiKey"})
+	w.RegisterActivityWithOptions(mtnActivities.GetAccessToken, activity.RegisterOptions{Name: "GetAccessToken"})
+	w.RegisterActivityWithOptions(mtnActivities.CreatePaymentRequest, activity.RegisterOptions{Name: "CreatePaymentRequest"})
+
+	// Register CRUD activities if available
+	crudActivities := activities.GetCrudActivitiesFromFactory()
+	if crudActivities != nil {
+		w.RegisterActivityWithOptions(crudActivities.CreateTransaction, activity.RegisterOptions{Name: "CreateTransaction"})
+		w.RegisterActivityWithOptions(crudActivities.UpdateWalletBalance, activity.RegisterOptions{Name: "UpdateWalletBalance"})
+		w.RegisterActivityWithOptions(crudActivities.GetWallet, activity.RegisterOptions{Name: "GetWallet"})
+		w.RegisterActivityWithOptions(crudActivities.HealthCheck, activity.RegisterOptions{Name: "CrudHealthCheck"})
+	}
 
 	log.Println("[Temporal] Worker started on task queue: afrikpay")
 	err = w.Run(worker.InterruptCh())

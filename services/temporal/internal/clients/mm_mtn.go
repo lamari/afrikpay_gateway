@@ -3,6 +3,7 @@ package clients
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/afrikpay/gateway/internal/models"
+	"github.com/google/uuid"
 )
 
 // MTNClient implements the MobileMoneyClient interface for MTN Mobile Money
@@ -56,6 +58,128 @@ func (c *MTNClient) GetName() string {
 // Close closes the client
 func (c *MTNClient) Close() error {
 	return nil
+}
+
+// CreateUser creates a new API user in MTN MoMo and stores the reference ID
+func (c *MTNClient) CreateUser(ctx context.Context, providerCallbackHost string) (string, error) {
+	referenceID := uuid.New().String()
+	url := fmt.Sprintf("%s/v1_0/apiuser", c.config.BaseURL)
+	payload := map[string]string{"providerCallbackHost": providerCallbackHost}
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Ocp-Apim-Subscription-Key", c.config.SecondaryKey)
+	req.Header.Set("X-Reference-Id", referenceID)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		return "", fmt.Errorf("MTN CreateUser API error: status %d", resp.StatusCode)
+	}
+
+	return referenceID, nil
+}
+
+// CreateApiKey generates an API key for the MTN API user and stores it
+func (c *MTNClient) CreateApiKey(ctx context.Context, referenceID string) (string, error) {
+	if referenceID == "" {
+		return "", fmt.Errorf("MTN reference ID is not set")
+	}
+	url := fmt.Sprintf("%s/v1_0/apiuser/%s/apikey", c.config.BaseURL, referenceID)
+	req, err := http.NewRequestWithContext(ctx, "POST", url, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Ocp-Apim-Subscription-Key", c.config.SecondaryKey)
+	req.Header.Set("X-Reference-Id", referenceID)
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusCreated {
+		return "", fmt.Errorf("MTN CreateApiKey API error: status %d", resp.StatusCode)
+	}
+	var res struct {
+		ApiKey string `json:"apiKey"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return "", err
+	}
+
+	return res.ApiKey, nil
+}
+
+// GetAccessToken retrieves an access token using the API key and stores it
+func (c *MTNClient) GetAccessToken(ctx context.Context, referenceID, apiKey string) (string, error) {
+	if referenceID == "" || apiKey == "" {
+		return "", fmt.Errorf("MTN reference ID or API key is not set")
+	}
+	url := fmt.Sprintf("%s/collection/token/", c.config.BaseURL)
+	req, err := http.NewRequestWithContext(ctx, "POST", url, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Ocp-Apim-Subscription-Key", c.config.SecondaryKey)
+	credential := base64.StdEncoding.EncodeToString([]byte(referenceID + ":" + apiKey))
+	req.Header.Set("Authorization", "Basic "+credential)
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("MTN GetAccessToken API error: status %d", resp.StatusCode)
+	}
+	var res struct {
+		AccessToken string `json:"access_token"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return "", err
+	}
+
+	return res.AccessToken, nil
+}
+
+// CreatePaymentRequest sends a payment request and returns the MTN response
+func (c *MTNClient) CreatePaymentRequest(ctx context.Context, referenceID, accessToken string, request *models.MTNPaymentRequest) (*models.MTNPaymentResponse, error) {
+	if accessToken == "" {
+		return nil, fmt.Errorf("MTN access token is not set")
+	}
+	url := fmt.Sprintf("%s/v1_0/paymentrequest", c.config.BaseURL)
+	jsonData, err := json.Marshal(request)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Ocp-Apim-Subscription-Key", c.config.SecondaryKey)
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("X-Reference-Id", referenceID)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusAccepted {
+		return nil, fmt.Errorf("MTN CreatePaymentRequest API error: status %d", resp.StatusCode)
+	}
+	var res models.MTNPaymentResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
 // initiatePayment initiates payment with MTN API
