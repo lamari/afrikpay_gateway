@@ -8,6 +8,7 @@ import (
 	"github.com/afrikpay/gateway/internal/config"
 	"github.com/afrikpay/gateway/internal/workflows"
 	"github.com/joho/godotenv"
+	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
@@ -48,11 +49,11 @@ func main() {
 
 	// Register activities using singleton factories
 	binanceActivities := activities.GetBinanceActivitiesFromFactory()
-	w.RegisterActivity(binanceActivities.GetPrice)
-	w.RegisterActivity(binanceActivities.GetQuotes)
-	w.RegisterActivity(binanceActivities.GetAllOrders)
-	w.RegisterActivity(binanceActivities.PlaceOrder)
-	w.RegisterActivity(binanceActivities.GetOrderStatus)
+	w.RegisterActivityWithOptions(binanceActivities.GetPrice, activity.RegisterOptions{Name: "GetPrice"})
+	w.RegisterActivityWithOptions(binanceActivities.GetQuotes, activity.RegisterOptions{Name: "GetQuotes"})
+	w.RegisterActivityWithOptions(binanceActivities.GetAllOrders, activity.RegisterOptions{Name: "GetAllOrders"})
+	w.RegisterActivityWithOptions(binanceActivities.PlaceOrder, activity.RegisterOptions{Name: "PlaceOrder"})
+	w.RegisterActivityWithOptions(binanceActivities.GetOrderStatus, activity.RegisterOptions{Name: "GetOrderStatus"})
 
 	log.Println("[Temporal] Worker started on task queue: afrikpay")
 	err = w.Run(worker.InterruptCh())

@@ -97,7 +97,7 @@ func TestBinanceActivitiesE2E(t *testing.T) {
 
 		// Ce test pourrait échouer si le client ne simule pas les ordres
 		// dans un environnement réel, il faudrait vérifier l'état du compte
-		order, err := binanceActivities.PlaceOrder(ctx, orderRequest)
+		response, err := binanceActivities.PlaceOrder(ctx, orderRequest)
 
 		// Si ce test échoue, c'est probablement parce que la fonction placeOrder
 		// dans client Binance essaie de placer un vrai ordre et n'est pas en mode simulation
@@ -106,8 +106,9 @@ func TestBinanceActivitiesE2E(t *testing.T) {
 			return
 		}
 
-		assert.NotNil(t, order, "Order should not be nil")
-		assert.Equal(t, orderRequest.Symbol, order.Symbol, "Symbol should match")
-		assert.Equal(t, orderRequest.Side, order.Side, "Side should match")
+		assert.Equal(t, response.Quantity, 0.001)
+		assert.NotNil(t, response, "Order should not be nil")
+		assert.Equal(t, orderRequest.Symbol, response.Symbol, "Symbol should match")
+		assert.Equal(t, orderRequest.Side, response.Side, "Side should match")
 	})
 }
