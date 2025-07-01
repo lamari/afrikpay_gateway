@@ -11,6 +11,7 @@ import (
 	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
+	"go.temporal.io/sdk/workflow"
 )
 
 func main() {
@@ -47,7 +48,7 @@ func main() {
 	w.RegisterWorkflow(workflows.BinanceOrdersWorkflow)
 	w.RegisterWorkflow(workflows.BinancePlaceOrderWorkflow)
 	w.RegisterWorkflow(workflows.BinanceGetOrderStatusWorkflow)
-	w.RegisterWorkflow(workflows.MTNPaymentWorkflow)
+	w.RegisterWorkflowWithOptions(workflows.MTNPaymentWorkflow, workflow.RegisterOptions{Name: "MTNPaymentWorkflow"})
 
 	// Register Binance activities using singleton factory
 	binanceActivities := activities.GetBinanceActivitiesFromFactory()

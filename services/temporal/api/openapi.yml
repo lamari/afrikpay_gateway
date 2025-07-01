@@ -1,0 +1,698 @@
+openapi: 3.0.3
+info:
+  title: Afrikpay Gateway - Temporal Service API
+  description: |
+    API documentation for the Temporal Service of Afrikpay Gateway.
+    This service is responsible for workflow orchestration with Saga pattern.
+  version: 1.0.0
+  contact:
+    name: Afrikpay Team
+    email: support@afrikpay.com
+servers:
+  - url: http://localhost:8003
+    description: Local development server
+  - url: https://api-temporal.afrikpay.com
+    description: Production server
+
+tags:
+  - name: Workflows
+    description: Workflow operations
+  - name: MTN
+    description: MTN Payment workflow operations
+  - name: Orange
+    description: Orange Money workflow operations
+  - name: Crypto
+    description: Cryptocurrency exchange workflow operations
+  - name: Health
+    description: Health check endpoints
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Check if the service is running
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /api/v1/workflows:
+    get:
+      tags:
+        - Workflows
+      summary: List workflows
+      description: Get a list of all workflows with pagination
+      operationId: listWorkflows
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: Filter by workflow status
+          required: false
+          schema:
+            type: string
+            enum: [Running, Completed, Failed, Cancelled]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/workflows/{id}:
+    get:
+      tags:
+        - Workflows
+      summary: Get workflow details
+      description: Get detailed information about a specific workflow
+      operationId: getWorkflow
+      parameters:
+        - name: id
+          in: path
+          description: Workflow ID
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Workflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    delete:
+      tags:
+        - Workflows
+      summary: Cancel workflow
+      description: Cancel an active workflow
+      operationId: cancelWorkflow
+      parameters:
+        - name: id
+          in: path
+          description: Workflow ID
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Workflow cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/mtn/payments:
+    post:
+      tags:
+        - MTN
+      summary: Initiate MTN payment workflow
+      description: Start a new MTN payment workflow
+      operationId: startMTNPaymentWorkflow
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MTNPaymentRequest'
+      responses:
+        '202':
+          description: Payment workflow initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  
+  /api/v1/mtn/payments/{id}:
+    get:
+      tags:
+        - MTN
+      summary: Get MTN payment workflow status
+      description: Check the status of an MTN payment workflow
+      operationId: getMTNPaymentStatus
+      parameters:
+        - name: id
+          in: path
+          description: Workflow ID
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Payment workflow status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MTNPaymentResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/orange/payments:
+    post:
+      tags:
+        - Orange
+      summary: Initiate Orange Money payment workflow
+      description: Start a new Orange Money payment workflow
+      operationId: startOrangeMoneyPaymentWorkflow
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrangePaymentRequest'
+      responses:
+        '202':
+          description: Payment workflow initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  
+  /api/v1/orange/payments/{id}:
+    get:
+      tags:
+        - Orange
+      summary: Get Orange Money payment workflow status
+      description: Check the status of an Orange Money payment workflow
+      operationId: getOrangeMoneyPaymentStatus
+      parameters:
+        - name: id
+          in: path
+          description: Workflow ID
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Payment workflow status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrangePaymentResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/crypto/buy:
+    post:
+      tags:
+        - Crypto
+      summary: Initiate cryptocurrency purchase workflow
+      description: Start a new workflow to purchase cryptocurrency
+      operationId: startCryptoPurchaseWorkflow
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CryptoPurchaseRequest'
+      responses:
+        '202':
+          description: Purchase workflow initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/crypto/exchanges:
+    get:
+      tags:
+        - Crypto
+      summary: List supported exchanges
+      description: Get a list of all supported cryptocurrency exchanges
+      operationId: listExchanges
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of exchanges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangesListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from the auth service
+
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    
+    ValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+    
+    NotFoundError:
+      description: The requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "ok"
+        version:
+          type: string
+          example: "1.0.0"
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Internal server error"
+        message:
+          type: string
+          example: "An unexpected error occurred"
+        code:
+          type: integer
+          example: 500
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - error
+        - message
+        - code
+        - timestamp
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Validation error"
+        message:
+          type: string
+          example: "Invalid request parameters"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "amount"
+              message:
+                type: string
+                example: "Amount must be greater than 0"
+        code:
+          type: integer
+          example: 400
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - error
+        - message
+        - details
+        - code
+        - timestamp
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operation completed successfully"
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - success
+        - message
+        - timestamp
+
+    WorkflowResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "f8c3de3d-1fea-4d7c-a8b0-29f63c4c3454"
+        type:
+          type: string
+          example: "MTNPaymentWorkflow"
+        status:
+          type: string
+          enum: [Running, Completed, Failed, Cancelled]
+          example: "Running"
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+      required:
+        - id
+        - type
+        - status
+        - startedAt
+
+    WorkflowListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowResponse'
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            total:
+              type: integer
+              example: 100
+            pages:
+              type: integer
+              example: 10
+      required:
+        - data
+        - pagination
+
+    MTNPaymentRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "5f8c3de3d1fea4d7ca8b029f"
+        phoneNumber:
+          type: string
+          example: "237612345678"
+        amount:
+          type: number
+          format: float
+          example: 5000.00
+        currency:
+          type: string
+          example: "XAF"
+        description:
+          type: string
+          example: "Wallet top-up"
+      required:
+        - userId
+        - phoneNumber
+        - amount
+        - currency
+        - description
+
+    MTNPaymentResponse:
+      type: object
+      properties:
+        workflowId:
+          type: string
+          example: "f8c3de3d-1fea-4d7c-a8b0-29f63c4c3454"
+        status:
+          type: string
+          enum: [Initiated, PaymentPending, PaymentVerified, PaymentFailed, Completed, Failed]
+          example: "PaymentPending"
+        transactionId:
+          type: string
+          example: "mtn-123456789"
+        userId:
+          type: string
+          example: "5f8c3de3d1fea4d7ca8b029f"
+        amount:
+          type: number
+          format: float
+          example: 5000.00
+        currency:
+          type: string
+          example: "XAF"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - workflowId
+        - status
+        - userId
+        - amount
+        - currency
+        - createdAt
+        - updatedAt
+
+    OrangePaymentRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "5f8c3de3d1fea4d7ca8b029f"
+        phoneNumber:
+          type: string
+          example: "237612345678"
+        amount:
+          type: number
+          format: float
+          example: 5000.00
+        currency:
+          type: string
+          example: "XAF"
+        description:
+          type: string
+          example: "Wallet top-up"
+      required:
+        - userId
+        - phoneNumber
+        - amount
+        - currency
+        - description
+
+    OrangePaymentResponse:
+      type: object
+      properties:
+        workflowId:
+          type: string
+          example: "f8c3de3d-1fea-4d7c-a8b0-29f63c4c3454"
+        status:
+          type: string
+          enum: [Initiated, PaymentPending, PaymentVerified, PaymentFailed, Completed, Failed]
+          example: "PaymentPending"
+        transactionId:
+          type: string
+          example: "orange-123456789"
+        userId:
+          type: string
+          example: "5f8c3de3d1fea4d7ca8b029f"
+        amount:
+          type: number
+          format: float
+          example: 5000.00
+        currency:
+          type: string
+          example: "XAF"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - workflowId
+        - status
+        - userId
+        - amount
+        - currency
+        - createdAt
+        - updatedAt
+
+    CryptoPurchaseRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "5f8c3de3d1fea4d7ca8b029f"
+        exchange:
+          type: string
+          enum: [Binance, Bitget]
+          example: "Binance"
+        cryptocurrency:
+          type: string
+          enum: [BTC, USDT]
+          example: "USDT"
+        amount:
+          type: number
+          format: float
+          example: 100.00
+        paymentCurrency:
+          type: string
+          example: "XAF"
+        paymentAmount:
+          type: number
+          format: float
+          example: 60000.00
+        receivingWalletAddress:
+          type: string
+          example: "0x1234567890abcdef1234567890abcdef12345678"
+      required:
+        - userId
+        - exchange
+        - cryptocurrency
+        - amount
+        - paymentCurrency
+        - paymentAmount
+        - receivingWalletAddress
+
+    ExchangesListResponse:
+      type: object
+      properties:
+        exchanges:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "binance"
+              name:
+                type: string
+                example: "Binance"
+              supportedCryptocurrencies:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    symbol:
+                      type: string
+                      example: "USDT"
+                    name:
+                      type: string
+                      example: "Tether"
+                    minAmount:
+                      type: number
+                      format: float
+                      example: 10.0
+              active:
+                type: boolean
+                example: true
+      required:
+        - exchanges
+
+

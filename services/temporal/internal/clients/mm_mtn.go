@@ -3,15 +3,16 @@ package clients
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/afrikpay/gateway/internal/models"
-	"github.com/google/uuid"
 )
 
 // MTNClient implements the MobileMoneyClient interface for MTN Mobile Money
@@ -60,9 +61,44 @@ func (c *MTNClient) Close() error {
 	return nil
 }
 
+// GenerateTimestampUUID generates a UUID with timestamp information embedded
+func GenerateTimestampUUID() string {
+	// Utiliser le timestamp Unix en nanosecondes
+	timestamp := time.Now().UnixNano()
+
+	// Générer des bytes aléatoires
+	randomBytes := make([]byte, 8)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	// Combiner timestamp + random pour créer un UUID valide
+	uuidBytes := make([]byte, 16)
+
+	// 8 premiers bytes: timestamp (little endian)
+	for i := 0; i < 8; i++ {
+		uuidBytes[i] = byte(timestamp >> (i * 8))
+	}
+
+	// 8 derniers bytes: aléatoires
+	copy(uuidBytes[8:], randomBytes)
+
+	// Forcer le format UUID v4
+	uuidBytes[6] = (uuidBytes[6] & 0x0f) | 0x40 // Version 4
+	uuidBytes[8] = (uuidBytes[8] & 0x3f) | 0x80 // Variant bits
+
+	return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x",
+		uuidBytes[0:4],
+		uuidBytes[4:6],
+		uuidBytes[6:8],
+		uuidBytes[8:10],
+		uuidBytes[10:16])
+}
+
 // CreateUser creates a new API user in MTN MoMo and stores the reference ID
 func (c *MTNClient) CreateUser(ctx context.Context, providerCallbackHost string) (string, error) {
-	referenceID := uuid.New().String()
+	referenceID := GenerateTimestampUUID()
 	url := fmt.Sprintf("%s/v1_0/apiuser", c.config.BaseURL)
 	payload := map[string]string{"providerCallbackHost": providerCallbackHost}
 	jsonData, err := json.Marshal(payload)
@@ -154,11 +190,17 @@ func (c *MTNClient) CreatePaymentRequest(ctx context.Context, referenceID, acces
 	if accessToken == "" {
 		return nil, fmt.Errorf("MTN access token is not set")
 	}
-	url := fmt.Sprintf("%s/v1_0/paymentrequest", c.config.BaseURL)
+	url := fmt.Sprintf("%s/collection/v1_0/requesttopay", c.config.BaseURL)
 	jsonData, err := json.Marshal(request)
 	if err != nil {
 		return nil, err
 	}
+
+	// Debug logging
+	fmt.Printf("[DEBUG] CreatePaymentRequest URL: %s\n", url)
+	fmt.Printf("[DEBUG] CreatePaymentRequest ReferenceID: %s\n", referenceID)
+	fmt.Printf("[DEBUG] CreatePaymentRequest AccessToken: %s\n", accessToken[:10]+"...")
+	fmt.Printf("[DEBUG] CreatePaymentRequest Payload: %s\n", string(jsonData))
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, err
@@ -166,19 +208,46 @@ func (c *MTNClient) CreatePaymentRequest(ctx context.Context, referenceID, acces
 	req.Header.Set("Ocp-Apim-Subscription-Key", c.config.SecondaryKey)
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("X-Reference-Id", referenceID)
+	req.Header.Set("X-Target-Environment", "sandbox")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	// Debug: read response body for error details
+	respBody, _ := io.ReadAll(resp.Body)
+	fmt.Printf("[DEBUG] CreatePaymentRequest Response Status: %d\n", resp.StatusCode)
+	fmt.Printf("[DEBUG] CreatePaymentRequest Response Body: %s\n", string(respBody))
+
 	if resp.StatusCode != http.StatusAccepted {
-		return nil, fmt.Errorf("MTN CreatePaymentRequest API error: status %d", resp.StatusCode)
+		return nil, fmt.Errorf("MTN CreatePaymentRequest API error: status %d, body: %s", resp.StatusCode, string(respBody))
 	}
+
+	// Si nous avons un code 2xx, c'est un succès même avec un corps vide
 	var res models.MTNPaymentResponse
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, err
+	
+	// Si le corps n'est pas vide, on essaie de le décoder
+	if len(respBody) > 0 {
+		// Reset body for JSON decoding
+		resp.Body = io.NopCloser(bytes.NewReader(respBody))
+		
+		// Tenter de décoder mais ne pas échouer si erreur EOF
+		if err := json.NewDecoder(resp.Body).Decode(&res); err != nil && err != io.EOF {
+			// On ne retourne une erreur que si c'est autre chose que EOF
+			return nil, fmt.Errorf("erreur de décodage JSON: %w", err)
+		}
 	}
+	
+	// Si le corps est vide ou ne contenait rien d'important, on remplit au moins les champs essentiels
+	if res.Status == "" {
+		// Pour une réponse avec code 202, on considère que le statut est PENDING
+		res.Status = string(models.PaymentStatusPending)
+		res.ReferenceID = referenceID
+		res.Reason = "Payment request accepted by MTN API"
+	}
+	
 	return &res, nil
 }
 

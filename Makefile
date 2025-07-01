@@ -67,6 +67,17 @@ build-temporal: ## Build temporal service only
 	@echo "🔨 Building temporal service..."
 	cd services/temporal && go build -o ../../bin/temporal ./cmd/main.go
 
+run-worker: ## Run Temporal worker locally
+	@echo "🏃 Starting Temporal worker..."
+	cd services/temporal && go run cmd/worker/main.go
+
+restart-worker: ## Clean restart Temporal worker
+	@echo "🔄 Restarting Temporal worker cleanly..."
+	$(MAKE) kill-temporal-workers
+	@sleep 2
+	@echo "🏃 Starting fresh Temporal worker..."
+	cd services/temporal && go run cmd/worker/main.go
+
 # Test Commands
 test: ## Run all tests
 	@echo "🧪 Running all tests..."
@@ -136,6 +147,14 @@ db-down: ## Stop databases
 	$(DOCKER_COMPOSE) stop mongodb postgresql
 
 # Utility Commands
+kill-temporal-workers: ## Kill all processes connected to Temporal port (7233)
+	@echo "🔪 Killing all Temporal worker processes..."
+	@echo "Processes connected to port 7233:"
+	@lsof -i :7233 2>/dev/null | grep -v COMMAND || echo "No processes found on port 7233"
+	@echo "Killing client processes (excluding ssh server)..."
+	@lsof -ti :7233 2>/dev/null | xargs -r bash -c 'for pid in "$$@"; do if ps -p $$pid -o comm= | grep -qv ssh; then echo "Killing PID $$pid"; kill $$pid 2>/dev/null || true; fi; done' _
+	@echo "✅ Temporal worker cleanup completed"
+
 clean: ## Clean build artifacts
 	@echo "🧹 Cleaning build artifacts..."
 	rm -rf bin/

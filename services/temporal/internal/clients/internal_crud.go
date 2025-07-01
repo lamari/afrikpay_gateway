@@ -80,7 +80,7 @@ func (c *CrudClient) CreateTransaction(ctx context.Context, transaction *models.
 		return nil, models.NewClientError("SERIALIZATION_ERROR", err.Error(), false)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/api/v1/transactions", c.baseURL), bytes.NewBuffer(jsonData))
+	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/transactions", c.baseURL), bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, models.NewClientError("REQUEST_ERROR", err.Error(), false)
 	}

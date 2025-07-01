@@ -1,0 +1,675 @@
+openapi: 3.0.0
+info:
+  title: Afrikpay Gateway API
+  description: API Gateway for Afrikpay microservices
+  version: '1.0'
+  contact:
+    name: Afrikpay Team
+servers:
+  - url: '/api'
+    description: API Gateway Base URL
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: INVALID_REQUEST
+        message:
+          type: string
+          example: Invalid request parameters
+        details:
+          type: string
+          example: Additional error details
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required:
+        - email
+        - password
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+    VerifyResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        subject:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+    RefreshRequest:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+      required:
+        - refresh_token
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Wallet:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        balance:
+          type: number
+          format: double
+        currency:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        wallet_id:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL, TRANSFER]
+        status:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED, CANCELLED]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MtnPaymentRequest:
+      type: object
+      properties:
+        phone_number:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+          default: XAF
+        wallet_id:
+          type: string
+      required:
+        - phone_number
+        - amount
+        - wallet_id
+    MtnPaymentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED]
+        reference_id:
+          type: string
+        payment_url:
+          type: string
+    OrangePaymentRequest:
+      type: object
+      properties:
+        phone_number:
+          type: string
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+          default: XAF
+        wallet_id:
+          type: string
+      required:
+        - phone_number
+        - amount
+        - wallet_id
+    OrangePaymentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED]
+        reference_id:
+          type: string
+        payment_url:
+          type: string
+    CryptoBuyRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+          enum: [USDT, BTC]
+        exchange:
+          type: string
+          enum: [BINANCE, BITGET]
+        wallet_id:
+          type: string
+      required:
+        - amount
+        - currency
+        - exchange
+        - wallet_id
+    ExchangeInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        available_currencies:
+          type: array
+          items:
+            type: string
+        min_amount:
+          type: number
+        max_amount:
+          type: number
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user and get JWT tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/verify:
+    get:
+      summary: Verify a JWT token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+        '401':
+          description: Token is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/refresh:
+    post:
+      summary: Refresh access token using refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: New access token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                name:
+                  type: string
+              required:
+                - email
+                - password
+                - name
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get user by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete user
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: User deleted
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /wallets:
+    post:
+      summary: Create a new wallet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                currency:
+                  type: string
+              required:
+                - user_id
+                - currency
+      responses:
+        '201':
+          description: Wallet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /wallets/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get wallet by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Wallet found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update wallet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                balance:
+                  type: number
+                currency:
+                  type: string
+      responses:
+        '200':
+          description: Wallet updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /transactions:
+    post:
+      summary: Create a new transaction
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                wallet_id:
+                  type: string
+                amount:
+                  type: number
+                  format: double
+                currency:
+                  type: string
+                type:
+                  type: string
+                  enum: [DEPOSIT, WITHDRAWAL, TRANSFER]
+              required:
+                - user_id
+                - wallet_id
+                - amount
+                - currency
+                - type
+      responses:
+        '201':
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /transactions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get transaction by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Transaction found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/mtn/payments:
+    post:
+      summary: Create MTN mobile money payment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MtnPaymentRequest'
+      responses:
+        '202':
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MtnPaymentResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/mtn/payments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Check MTN payment status
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payment status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MtnPaymentResponse'
+        '404':
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/orange/payments:
+    post:
+      summary: Create Orange Money payment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrangePaymentRequest'
+      responses:
+        '202':
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrangePaymentResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/orange/payments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Check Orange Money payment status
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payment status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrangePaymentResponse'
+        '404':
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/crypto/buy:
+    post:
+      summary: Buy cryptocurrency
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CryptoBuyRequest'
+      responses:
+        '202':
+          description: Buy order initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/crypto/exchanges:
+    get:
+      summary: Get available crypto exchanges
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of exchanges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExchangeInfo'

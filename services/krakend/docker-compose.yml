@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  krakend:
+    image: devopsfaith/krakend:2.5
+    container_name: afrikpay-krakend
+    volumes:
+      - ./config:/etc/krakend/
+    ports:
+      - "8000:8000"
+    environment:
+      - FC_ENABLE=1
+      - FC_SETTINGS=/etc/krakend/settings
+      - FC_PARTIALS=/etc/krakend/partials
+      - FC_TEMPLATES=/etc/krakend/templates
+      - KRAKEND_PORT=8000
+    networks:
+      - afrikpay-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  afrikpay-network:
+    external: true

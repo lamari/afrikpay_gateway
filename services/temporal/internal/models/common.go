@@ -329,7 +329,7 @@ type TransactionStatusResponse struct {
 type MobileMoneyConfig struct {
 	Provider        string        // "mtn" or "orange"
 	BaseURL         string        `yaml:"base_url"`
-	APIKey          string        `yaml:"primary_key,omitempty"` // Pour MTN c'est primary_key, pour Orange c'est client_id
+	APIKey          string        `yaml:"primary_key,omitempty"`   // Pour MTN c'est primary_key, pour Orange c'est client_id
 	APISecret       string        `yaml:"secondary_key,omitempty"` // Pour MTN c'est secondary_key, pour Orange c'est client_secret
 	SubscriptionKey string        `yaml:"authorization,omitempty"` // Utilisé par Orange
 	Timeout         time.Duration `yaml:"timeout"`
@@ -396,9 +396,9 @@ const (
 // Transaction represents a financial transaction in the system
 type Transaction struct {
 	ID          string            `json:"id,omitempty"`
-	Type        TransactionType   `json:"type" validate:"required"`
-	Status      TransactionStatus `json:"status" validate:"required"`
-	UserID      string            `json:"user_id" validate:"required"`
+	Type        string            `json:"type" validate:"required"`
+	Status      string            `json:"status" validate:"required"`
+	UserID      string            `json:"user_id"`
 	WalletID    string            `json:"wallet_id,omitempty"`
 	Amount      float64           `json:"amount" validate:"required,gt=0"`
 	Currency    string            `json:"currency" validate:"required"`
@@ -407,6 +407,15 @@ type Transaction struct {
 	Metadata    map[string]string `json:"metadata,omitempty"`
 	CreatedAt   time.Time         `json:"created_at,omitempty"`
 	UpdatedAt   time.Time         `json:"updated_at,omitempty"`
+}
+
+// Deposit represents a deposit transaction
+type Deposit struct {
+	ID       string  `json:"id" validate:"required"`
+	WalletID string  `json:"wallet_id" validate:"required"`
+	Amount   float64 `json:"amount" validate:"required,gt=0"`
+	Type     string  `json:"type" validate:"required,eq=deposit"`
+	Status   string  `json:"status" validate:"required,eq=pending"`
 }
 
 // Validate validates the transaction
@@ -447,12 +456,12 @@ type TransactionResponse struct {
 
 // WalletResponse represents a response from getting or updating a wallet
 type WalletResponse struct {
-	WalletID   string    `json:"wallet_id"`
-	UserID     string    `json:"user_id"`
-	Balance    float64   `json:"balance"`
-	Currency   string    `json:"currency"`
-	CreatedAt  time.Time `json:"created_at,omitempty"`
-	UpdatedAt  time.Time `json:"updated_at,omitempty"`
-	Success    bool      `json:"success"`
-	Error      string    `json:"error,omitempty"`
+	WalletID  string    `json:"wallet_id"`
+	UserID    string    `json:"user_id"`
+	Balance   float64   `json:"balance"`
+	Currency  string    `json:"currency"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	Success   bool      `json:"success"`
+	Error     string    `json:"error,omitempty"`
 }
