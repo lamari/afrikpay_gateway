@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Présentation Architecture Afrikpay Gateway - MVP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 40px;
+            background: white;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            animation: slideInDown 1s ease-out;
+        }
+
+        .slide-subtitle {
+            font-size: 1.5rem;
+            color: #666;
+            margin-bottom: 2rem;
+            animation: slideInUp 1s ease-out 0.3s both;
+        }
+
+        .slide-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 1s ease-out 0.6s both;
+            text-align: left;
+        }
+
+        .anti-pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .anti-pattern-card {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: left;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        .anti-pattern-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .anti-pattern-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .anti-pattern-card li {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .anti-pattern-card li:before {
+            content: "❌";
+            position: absolute;
+            left: -0.5rem;
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .solution-card {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: left;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        .solution-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .solution-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .solution-card li {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .solution-card li:before {
+            content: "✅";
+            position: absolute;
+            left: -0.5rem;
+        }
+
+        .comparison-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .winner {
+            background: linear-gradient(135deg, #51cf66, #40c057) !important;
+            color: white;
+            font-weight: 600;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #ffd43b, #fab005) !important;
+            color: #333;
+        }
+
+        .poor {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52) !important;
+            color: white;
+        }
+
+        .language-comparison {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .language-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .language-table th,
+        .language-table td {
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .language-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .go-highlight {
+            background: linear-gradient(135deg, #00d4aa, #00a693) !important;
+            color: white;
+            font-weight: 600;
+        }
+
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .advantage-card {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: left;
+        }
+
+        .advantage-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .architecture-visual {
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .architecture-layer {
+            background: white;
+            margin: 1rem 0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease;
+            text-align: left;
+        }
+
+        .architecture-layer:hover {
+            transform: translateX(10px);
+        }
+
+        .companies-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin: 2rem 0;
+        }
+
+        .company-list {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .company-list h3 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .company-item {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .company-item strong {
+            color: #333;
+        }
+
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .roadmap-card {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: left;
+            color: #333;
+        }
+
+        .roadmap-card h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .slide-indicator {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .krakend-visual {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .krakend-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .krakend-feature {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .krakend-feature h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .concurrency-chart {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .concurrency-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: end;
+            height: 200px;
+            margin: 2rem 0;
+        }
+
+        .bar {
+            background: rgba(255,255,255,0.8);
+            color: #333;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .bar.go { height: 100%; background: #00d4aa; color: white; }
+        .bar.java { height: 20%; }
+        .bar.node { height: 30%; }
+        .bar.python { height: 25%; }
+        .bar.csharp { height: 35%; }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .temporal-scenario {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .workflow-step {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child):after {
+            content: "→";
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .demo-section {
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .demo-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .conclusion-highlight {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            padding: 2rem;
+            border-radius: 15px;
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(255,215,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-indicator">
+            <span id="currentSlide">1</span> / <span id="totalSlides">12</span>
+        </div>
+
+        <!-- Slide 1: Titre -->
+        <div class="slide active">
+            <div class="slide-content">
+                <h1 class="slide-title">Présentation de l'Architecture</h1>
+                <h1 class="slide-title">Afrikpay Gateway</h1>
+                <h2 class="slide-subtitle">MVP</h2>
+                <div class="conclusion-highlight">
+                    🚀 Une gateway crypto révolutionnaire construite avec les technologies d'entreprise de demain
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introduction -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Introduction</h1>
+                <h2 class="slide-subtitle">Le défi technique que nous résolvons</h2>
+                
+                <div class="slide-text">
+                    <p>Cette présentation détaille l'architecture d'une gateway crypto, utilisant <strong>Temporal</strong> un moteur de workflow. Nous examinerons les choix technologiques, les intégrations API, ainsi que les implémentations en matière de sécurité.</p>
+                </div>
+
+                <div class="architecture-visual">
+                    <div class="architecture-layer">
+                        <strong>🎯 Objectif :</strong> Architecture scalable pour les paiements crypto en Afrique
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>🔧 Approche :</strong> Stack moderne avec Temporal + Go + KrakenD
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>🚀 Résultat :</strong> MVP production-ready en quelques semaines
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Anti-patterns -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">❌ Anti-patterns</h1>
+                <h2 class="slide-subtitle">Ce qu'il ne faut PAS faire</h2>
+                
+                <div class="anti-pattern-grid">
+                    <div class="anti-pattern-card">
+                        <h3>1. Architecture Monolithique Synchrone</h3>
+                        <ul>
+                            <li>Point de défaillance unique : Si un service tombe, tout s'arrête</li>
+                            <li>Couplage fort : Les services sont directement dépendants</li>
+                            <li>Pas de gestion d'erreurs : Aucune stratégie de récupération</li>
+                            <li>Timeouts non gérés : Risque de blocage indéfini</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="anti-pattern-card">
+                        <h3>2. Gestion d'État Volatile</h3>
+                        <ul>
+                            <li>Perte de données en cas de redémarrage</li>
+                            <li>Impossibilité de reprendre un processus interrompu</li>
+                            <li>Pas de traçabilité des étapes effectuées</li>
+                            <li>Debugging complexe sans historique</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="anti-pattern-card">
+                        <h3>3. Retry Logic Primitif</h3>
+                        <ul>
+                            <li>Surcharge des services en cas de pic d'erreurs</li>
+                            <li>Pas de circuit breaker pour protéger les services</li>
+                            <li>Pas de gestion d'erreurs intelligente</li>
+                            <li>Timeouts non gérés : Risque de blocage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Méthode Optimale - Temporal -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">✅ Méthode Optimale</h1>
+                <h2 class="slide-subtitle">Temporal Workflows</h2>
+                
+                <div class="solution-grid">
+                    <div class="solution-card">
+                        <h3>Gestion Intelligente des Erreurs</h3>
+                        <ul>
+                            <li>Circuit breaker intégré</li>
+                            <li>Timeout configurable par activité</li>
+                            <li>Compensation automatique en cas d'échec</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="solution-card">
+                        <h3>Orchestration Complexe</h3>
+                        <ul>
+                            <li>Exécution parallèle d'activités indépendantes</li>
+                            <li>Synchronisation de branches multiples</li>
+                            <li>Conditions dynamiques basées sur les résultats</li>
+                            <li>Saga patterns pour les transactions distribuées</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="solution-card">
+                        <h3>Architecture Recommandée</h3>
+                        <ul>
+                            <li>État persistant : Survit aux redémarrages et crashes</li>
+                            <li>Exactly-once execution : Garantit qu'une activité n'est exécutée qu'une fois</li>
+                            <li>Reprendre où on s'est arrêté : Continuation automatique après interruption</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Temporal Scenario -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Temporal Scenario</h1>
+                <h2 class="slide-subtitle">Comment ça fonctionne concrètement</h2>
+                
+                <div class="temporal-scenario">
+                    <div class="workflow-steps">
+                        <div class="workflow-step">Client</div>
+                        <div class="workflow-step">Engine</div>
+                        <div class="workflow-step">TaskQueues</div>
+                        <div class="workflow-step">WorkflowDefinition</div>
+                        <div class="workflow-step">Task1</div>
+                        <div class="workflow-step">Task2</div>
+                    </div>
+                    
+                    <div class="slide-text">
+                        <h3>Flux d'exécution :</h3>
+                        <p><strong>1. Start :</strong> Le client démarre un workflow</p>
+                        <p><strong>2. Get Commands :</strong> Le moteur récupère les tâches à exécuter</p>
+                        <p><strong>3. Execute Tasks :</strong> Exécution des activités (Task1, Task2...)</p>
+                        <p><strong>4. Activity Task :</strong> Chaque tâche est ajoutée et exécutée de manière fiable</p>
+                        <p><strong>5. Completed :</strong> Retour du résultat une fois terminé</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Temporal vs Autres solutions -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Temporal vs Autres solutions</h1>
+                <h2 class="slide-subtitle">Comparaison objective des alternatives</h2>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Critère</th>
+                                <th>Temporal</th>
+                                <th>Apache Airflow</th>
+                                <th>AWS Step Functions</th>
+                                <th>Camunda</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Langage natif</strong></td>
+                                <td class="winner">Go ✅</td>
+                                <td class="poor">Python ❌</td>
+                                <td class="warning">AWS SDK ⚠️</td>
+                                <td class="warning">Java ⚠️</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Résilience</strong></td>
+                                <td class="winner">Excellente ✅</td>
+                                <td class="warning">Moyenne ⚠️</td>
+                                <td class="winner">Bonne ✅</td>
+                                <td class="winner">Bonne ✅</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scalabilité</strong></td>
+                                <td class="winner">Horizontale ✅</td>
+                                <td class="warning">Limitée ⚠️</td>
+                                <td class="warning">AWS-dépendant ⚠️</td>
+                                <td class="warning">Moyenne ⚠️</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gestion d'état</strong></td>
+                                <td class="winner">Automatique ✅</td>
+                                <td class="poor">Manuelle ❌</td>
+                                <td class="winner">Automatique ✅</td>
+                                <td class="warning">Semi-auto ⚠️</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Coût</strong></td>
+                                <td class="winner">Open Source ✅</td>
+                                <td class="winner">Open Source ✅</td>
+                                <td class="poor">Pay-per-use ❌</td>
+                                <td class="poor">Enterprise ❌</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Complexité</strong></td>
+                                <td class="winner">Moyenne</td>
+                                <td class="poor">Élevée</td>
+                                <td class="winner">Moyenne</td>
+                                <td class="poor">Élevée</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: API Gateway KrakenD -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">L'API Gateway KrakenD</h1>
+                <h2 class="slide-subtitle">La porte d'entrée sécurisée de notre écosystème</h2>
+                
+                <div class="krakend-visual">
+                    <div class="krakend-features">
+                        <div class="krakend-feature">
+                            <h4>📊 Monitoring</h4>
+                            <p>Logging<br>Stats</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>🔒 Security</h4>
+                            <p>SSL<br>Security policies</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>🚦 Throttling</h4>
+                            <p>Rate limiting<br>User quota</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>🔄 Proxy</h4>
+                            <p>OAuth<br>Protocol Translation<br>Load Balancing</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>⭐ QoS</h4>
+                            <p>Concurrent calls<br>Circuit Breaker<br>Grained timeout</p>
+                        </div>
+                    </div>
+                    
+                    <div class="krakend-features">
+                        <div class="krakend-feature">
+                            <h4>💾 Cache</h4>
+                            <p>Caching headers</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>🔄 Aggregation</h4>
+                            <p>Merge sources</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>🔧 Manipulation</h4>
+                            <p>Transform</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>🔍 Filtering</h4>
+                            <p>Filter responses</p>
+                        </div>
+                        <div class="krakend-feature">
+                            <h4>📝 Decoding</h4>
+                            <p>From JSON, XML...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-text">
+                    <p><strong>Avantage clé :</strong> KrakenD nous donne toutes les fonctionnalités enterprise d'une API Gateway sans la complexité des solutions propriétaires.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Go vs Autres Langages -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Go vs Autres Langages</h1>
+                <h2 class="slide-subtitle">Pourquoi Go est notre choix stratégique</h2>
+                
+                <div class="language-comparison">
+                    <table class="language-table">
+                        <thead>
+                            <tr>
+                                <th>Langage</th>
+                                <th>Temps d'exécution</th>
+                                <th>Mémoire (MB)</th>
+                                <th>Temps de compilation</th>
+                                <th>Performance CPU</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="go-highlight">
+                                <td>Go</td>
+                                <td>0.85s</td>
+                                <td>12 MB</td>
+                                <td>&lt; 1s</td>
+                                <td>Excellent</td>
+                            </tr>
+                            <tr>
+                                <td>Java</td>
+                                <td>1.63s</td>
+                                <td>20.2 MB</td>
+                                <td>3-5s</td>
+                                <td>Bon</td>
+                            </tr>
+                            <tr>
+                                <td>Python</td>
+                                <td>4.2s</td>
+                                <td>8 MB</td>
+                                <td>Instantané</td>
+                                <td>Moyen</td>
+                            </tr>
+                            <tr>
+                                <td>Node.js</td>
+                                <td>2.1s</td>
+                                <td>35 MB</td>
+                                <td>Instantané</td>
+                                <td>Bon</td>
+                            </tr>
+                            <tr>
+                                <td>Ruby</td>
+                                <td>5.8s</td>
+                                <td>15 MB</td>
+                                <td>Instantané</td>
+                                <td>Faible</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="concurrency-chart">
+                    <h3>Capacité de concurrence (nombre d'unités simultanées)</h3>
+                    <div class="concurrency-bars">
+                        <div class="bar go">Go<br>1M+<br>Goroutines</div>
+                        <div class="bar java">Java<br>~5K<br>Threads</div>
+                        <div class="bar node">Node.js<br>~10K<br>Connections</div>
+                        <div class="bar python">Python<br>~1K<br>Threads</div>
+                        <div class="bar csharp">C#<br>~15K<br>Tasks</div>
+                    </div>
+                </div>
+
+                <div class="advantages-grid">
+                    <div class="advantage-card">
+                        <h3>🏆 Avantages de Go</h3>
+                        <ul>
+                            <li>Compilation native : Pas de machine virtuelle</li>
+                            <li>Garbage Collector optimisé : Pauses minimales</li>
+                            <li>Binaires statiques : Aucune dépendance externe</li>
+                            <li>Démarrage instantané : Contrairement à Java/JVM</li>
+                            <li>Empreinte mémoire réduite : 10-40x moins que Python</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="advantage-card">
+                        <h3>⚡ Go: Réactif naturel</h3>
+                        <ul>
+                            <li>Channels natifs : Pas besoin de frameworks externes</li>
+                            <li>Backpressure automatique : Géré par les channels</li>
+                            <li>Debugging simple : Stack traces claires</li>
+                            <li>Code impératif : Facile à lire et comprendre</li>
+                            <li>Performance supérieure : Pas d'overhead de frameworks</li>
+                            <li>Gestion d'erreurs claire : Syntaxe explicite</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Architecture Globale -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Architecture Globale</h1>
+                <h2 class="slide-subtitle">Notre stack complète en production</h2>
+                
+                <div class="architecture-visual">
+                    <div class="architecture-layer">
+                        <strong>📱 Frontend Layer</strong><br>
+                        Mobile Apps • Web Apps • Partner APIs • Temporal UI
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>🌐 API Gateway (KrakenD)</strong><br>
+                        Point d'entrée unique • Rate limiting • OAuth • Load balancing
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>🔐 Services Layer</strong><br>
+                        Auth Service (JWT, OAuth2) • CRUD Service (User, Wallet, Transaction) • Temporal API Service (Workflow starter)
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>🧠 Orchestration Layer (Temporal)</strong><br>
+                        Workflow Engine • Persistent State • Retry Policy • Monitoring
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>⚡ Worker Layer</strong><br>
+                        Workers (clients, activities, workflow) - Intégrations 3rd party APIs
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>🗄️ Data Layer</strong><br>
+                        MongoDB • PostgreSQL
+                    </div>
+                    <div class="architecture-layer">
+                        <strong>🔌 External APIs</strong><br>
+                        Binance • Orange Money • MoMo • Bitget
+                    </div>
+                </div>
+
+                <div class="slide-text">
+                    <p><strong>Pourquoi cette architecture :</strong></p>
+                    <ul>
+                        <li>Architecture orientée microservices avec Temporal comme orchestrateur</li>
+                        <li>Stack 100% Go pour des performances optimales</li>
+                        <li>Sécurité renforcée avec KrakenD API Gateway</li>
+                        <li>Résilience et scalabilité native</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Entreprises qui utilisent ces technologies -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Validation Marché</h1>
+                <h2 class="slide-subtitle">Les géants tech qui utilisent notre stack</h2>
+                
+                <div class="companies-section">
+                    <div class="company-list">
+                        <h3>🔵 Entreprises utilisant Temporal</h3>
+                        <div class="company-item">
+                            <strong>🚗 Uber :</strong> Créateur original (fork de Cadence)
+                        </div>
+                        <div class="company-item">
+                            <strong>🖥️ NVIDIA :</strong> Gestion flotte GPU across clouds
+                        </div>
+                        <div class="company-item">
+                            <strong>📺 Netflix :</strong> Traitement média et workflows
+                        </div>
+                        <div class="company-item">
+                            <strong>💳 Stripe :</strong> Traitement paiements et workflows
+                        </div>
+                        <div class="company-item">
+                            <strong>🪙 Coinbase :</strong> Workflows crypto et transactions
+                        </div>
+                        <div class="company-item">
+                            <strong>📊 Datadog :</strong> Monitoring distribué
+                        </div>
+                        <div class="company-item">
+                            <strong>🎬 Descript :</strong> Traitement vidéo IA et voix générée
+                        </div>
+                        <div class="company-item">
+                            <strong>☁️ Salesforce :</strong> A migré son application monolithique vers Temporal
+                        </div>
+                        <div class="company-item">
+                            <strong>📞 Twilio :</strong> A remplacé ses systèmes maison par Temporal Cloud
+                        </div>
+                    </div>
+                    
+                    <div class="company-list">
+                        <h3>🟢 Entreprises utilisant Go</h3>
+                        <div class="company-item">
+                            <strong>🔍 Google :</strong> Créateur, utilise massivement
+                        </div>
+                        <div class="company-item">
+                            <strong>🚗 Uber :</strong> Service plus haut QPS en Go
+                        </div>
+                        <div class="company-item">
+                            <strong>🎵 SoundCloud :</strong> 50% des services backend
+                        </div>
+                        <div class="company-item">
+                            <strong>🎮 Twitch :</strong> Streaming & chat en Go
+                        </div>
+                        <div class="company-item">
+                            <strong>💾 Dropbox :</strong> Systèmes large échelle
+                        </div>
+                        <div class="company-item">
+                            <strong>📺 Netflix :</strong> Microservices
+                        </div>
+                        <div class="company-item">
+                            <strong>🛒 Shopify :</strong> E-commerce scale
+                        </div>
+                        <div class="company-item">
+                            <strong>🎯 Target :</strong> Backend systems
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conclusion-highlight">
+                    💡 Ces entreprises ont choisi notre stack pour les mêmes raisons : performance, fiabilité, et scalabilité éprouvées à l'échelle mondiale
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Aller plus loin -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Aller plus loin</h1>
+                <h2 class="slide-subtitle">Extensions et améliorations futures</h2>
+                
+                <div class="roadmap-grid">
+                    <div class="roadmap-card">
+                        <h3>🔒 Sécurité & Infrastructure</h3>
+                        <ul>
+                            <li>TLS/mTLS + DNS management (Cloudflare, Route53)</li>
+                            <li>Authentification : Keycloak, Authentik, Okta OAuth</li>
+                            <li>Secrets Management : HashiCorp Vault</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <h3>📊 Event Streaming & Search</h3>
+                        <ul>
+                            <li>Apache Kafka pour l'event sourcing</li>
+                            <li>Moteurs de recherche : Elasticsearch, Meilisearch</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <h3>⚙️ Production & DevOps</h3>
+                        <ul>
+                            <li>Kubernetes : Helm charts, operators, service mesh (Istio)</li>
+                            <li>CI/CD sécurisé : GitOps (ArgoCD), security scans</li>
+                            <li>Password: Vault</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <h3>📈 Observabilité</h3>
+                        <ul>
+                            <li>Monitoring : Prometheus, Grafana, Jaeger tracing</li>
+                            <li>Logging centralisé : ELK Stack, Loki</li>
+                            <li>Alerting intelligent : PagerDuty, Slack webhooks</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <h3>🤖 Automatisation & Innovation</h3>
+                        <ul>
+                            <li>Backup/Restore automatisés (Velero, custom scripts)</li>
+                            <li>IA-Generated APIs : Génération CRUD + Workflows</li>
+                            <li>GitOps : Configuration drift detection</li>
+                            <li>Chaos Engineering : Resilience testing</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <h3>📚 Ressources</h3>
+                        <ul>
+                            <li>Documentation</li>
+                            <li>OpenAPI</li>
+                            <li>Postman</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Conclusions -->
+        <div class="slide">
+            <div class="slide-content">
+                <h1 class="slide-title">Conclusions</h1>
+                <h2 class="slide-subtitle">Un MVP qui pose les bases du succès</h2>
+                
+                <div class="conclusion-highlight">
+                    Cette architecture offre une solution robuste pour la gestion des workflow traitant les API de cryptomonnaies et de transfert d'argent, intégrant sécurité et efficacité.
+                </div>
+                
+                <div class="roadmap-grid">
+                    <div class="roadmap-card">
+                        <h3>🎯 Avantages Immédiats</h3>
+                        <ul>
+                            <li>MVP déployable en production immédiatement</li>
+                            <li>Stack éprouvée par les géants tech</li>
+                            <li>Coûts d'infrastructure optimisés</li>
+                            <li>Résilience native aux pannes</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="roadmap-card">
+                        <h3>🚀 Vision Future</h3>
+                        <ul>
+                            <li>Scalabilité automatique vers des millions d'utilisateurs</li>
+                            <li>Extensions modulaires sans refonte</li>
+                            <li>Analytics et intelligence artificielle intégrées</li>
+                            <li>Positionnement comme pilier robuste du marché africain</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="demo-section">
+                    <h2>🔥 Ready for Demo</h2>
+                    <p>MVP fonctionnel • Architecture éprouvée • Prêt pour la production</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">← Précédent</button>
+        <button class="nav-btn" onclick="nextSlide()">Suivant →</button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            document.getElementById('currentSlide').textContent = index + 1;
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+            showSlide(currentSlideIndex);
+        }
+
+        function previousSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+            showSlide(currentSlideIndex);
+        }
+
+        // Navigation au clavier
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Animation d'entrée
+        window.addEventListener('load', function() {
+            showSlide(0);
+        });
+    </script>
+</body>
+</html>
